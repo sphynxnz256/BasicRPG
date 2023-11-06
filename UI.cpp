@@ -15,6 +15,18 @@ void UI::initHpBar()
 	this->hpCurrentBar.setFillColor(sf::Color::Green);
 }
 
+void UI::initFonts()
+{
+	if (!this->font.loadFromFile("fonts/arial.ttf"))
+	{
+		std::cout << "ERROR::UI::INITFONTS::Could not load arial.ttf\n";
+	}
+}
+
+void UI::initText()
+{
+}
+
 //constructor
 UI::UI()
 {
@@ -27,11 +39,12 @@ UI::~UI()
 }
 
 //setters
-void UI::setHpBarPosition(const float x)
+void UI::setHpBarPosition(const float target_x, const float enemy_top)
 {
-	float x_position = x / 2 - hpMaxBar.getGlobalBounds().width / 2;
-	this->hpMaxBar.setPosition(x_position, 20.f);
-	this->hpCurrentBar.setPosition(x_position, 20.f);
+	float x_position = target_x / 2 - hpMaxBar.getGlobalBounds().width / 2;
+	float y_position = enemy_top - 20.f;
+	this->hpMaxBar.setPosition(x_position, y_position);
+	this->hpCurrentBar.setPosition(x_position, y_position);
 }
 
 void UI::setHpBarColor(const float current_hp, const float max_hp)

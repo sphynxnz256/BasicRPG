@@ -7,7 +7,7 @@
 void Game::initWindow()
 {
 	/*create game window*/
-	this->window.create(sf::VideoMode(600, 800), "Basic RPG", sf::Style::Close | sf::Style::Titlebar);
+	this->window.create(sf::VideoMode(800, 600), "Basic RPG", sf::Style::Close | sf::Style::Titlebar);
 }
 
 void Game::initPlayer()
@@ -20,10 +20,10 @@ void Game::initPlayer()
 void Game::initEnemy()
 {
 	/*this will hold our enemy state*/
-	this->enemy = new Enemy();
+	this->enemy = new Enemy(rng);
 	this->enemy->setPosition(
 		this->window.getSize().x /2 - this->enemy->getGlobalBounds().width / 2, 
-		this->window.getSize().y / 4 - this->enemy->getGlobalBounds().height / 2);
+		this->window.getSize().y / 2 - this->enemy->getGlobalBounds().height / 2);
 }
 
 void Game::initAnimator()
@@ -37,7 +37,7 @@ void Game::initUI()
 {
 	/*this currently sets up a hp bar at the top of the screen so current hp can be seen*/
 	this->ui = new UI();
-	this->ui->setHpBarPosition(this->window.getSize().x);
+	this->ui->setHpBarPosition(this->window.getSize().x, this->enemy->getGlobalBounds().top);
 }
 
 void Game::polledEvents()
@@ -91,7 +91,15 @@ void Game::updateCombat()
 	/*when the enemy reaches 0 health, this plays a death animation*/
 	if (this->enemy->getHpCurrent() <= 0.f)
 	{
-		this->playAnimation = true; 
+		this->playAnimation = true;
+		if(animator->getAnimationEnd())
+		{
+			this->enemy->resetEnemy();
+			this->animator->resetAnimator(this->enemy->getSprite());
+			this->playAnimation = false;
+			this->ui->setHpBarLength(this->enemy->getHpCurrent(), this->enemy->getHpMax());
+			this->ui->setHpBarColor(this->enemy->getHpCurrent(), this->enemy->getHpMax());
+		}
 	}
 }
 
@@ -104,7 +112,7 @@ void Game::updateAnimator()
 	{
 		this->animator->update();
 		this->animator->setPosition(this->window.getSize().x / 2 - this->animator->getGlobalBounds().width / 2,
-			this->window.getSize().y / 4 - this->animator->getGlobalBounds().height / 2);
+			this->window.getSize().y / 2 - this->animator->getGlobalBounds().height / 2);
 	}
 }
 
@@ -136,7 +144,7 @@ void Game::renderUI()
 }
 
 //constructor
-Game::Game()
+Game::Game(RNG& rng) : rng(rng)
 {
 	this->initWindow();
 	this->initEnemy();

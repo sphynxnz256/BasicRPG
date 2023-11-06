@@ -8,8 +8,16 @@ private:
 	sf::RectangleShape hpMaxBar;
 	sf::RectangleShape hpCurrentBar;
 
+	sf::Font font;
+	sf::Text coins;
+	sf::Text damage;
+
+
+
 	//private functions
 	void initHpBar();
+	void initFonts();
+	void initText();
 
 public:
 	//constructor
@@ -18,7 +26,7 @@ public:
 	~UI();
 
 	//setters
-	void setHpBarPosition(const float x);
+	void setHpBarPosition(const float target_x, const float enemy_top);
 	void setHpBarColor(const float current_hp,const float max_hp);
 	void setHpBarLength(const float current_hp, const float max_hp);
 

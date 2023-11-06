@@ -13,6 +13,7 @@ void Animator::initSrite(sf::Sprite sprite)
 void Animator::initFlags()
 {
 	this->firstFrame = true;
+	this->animationEnd = false;
 }
 
 void Animator::updateAnimation()
@@ -39,6 +40,7 @@ void Animator::updateAnimation()
 	else
 	{
 		this->sprite.setScale(0.f, 0.f);
+		this->animationEnd = true;
 	}
 }
 
@@ -60,10 +62,24 @@ const sf::FloatRect& Animator::getGlobalBounds() const
 	return sprite.getGlobalBounds();
 }
 
+const bool Animator::getAnimationEnd() const
+{
+	return this->animationEnd;
+}
+
 //setters
 void Animator::setPosition(float x, float y)
 {
 	sprite.setPosition(x, y);
+}
+
+//public functions
+void Animator::resetAnimator(sf::Sprite sprite)
+{
+	this->animationEnd = false;
+	this->firstFrame = true;
+	this->sprite = sprite;
+
 }
 
 void Animator::update()

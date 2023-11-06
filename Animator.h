@@ -13,6 +13,7 @@ private:
 	float dt;
 
 	bool firstFrame;
+	bool animationEnd;
 	float speed;
 
 	//private initation functions
@@ -30,11 +31,14 @@ public:
 
 	//getters
 	const sf::FloatRect& getGlobalBounds() const;
+	const bool getAnimationEnd() const;
 
 	//setters
 	void setPosition(float x, float y);
 
 	//public functions
+	void resetAnimator(sf::Sprite sprite);
+
 	void update();
 	void render(sf::RenderTarget& target);
 };

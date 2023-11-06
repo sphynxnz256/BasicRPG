@@ -10,12 +10,38 @@ void Enemy::initVariables()
 	hpCurrent = hpMax;
 }
 
-void Enemy::initTexture()
+void Enemy::initTextures()
 {
-	if (!this->texture.loadFromFile("textures/slime.png"))
+	//store addresses of textures in map	
+	this->textureAddressMap[1] = "textures/slime.png";
+	this->textureAddressMap[2] = "textures/crab.png";
+	this->textureAddressMap[3] = "textures/rat.png";
+	this->textureAddressMap[4] = "textures/raven.png";
+	this->textureAddressMap[5] = "textures/mushroom monster.png";
+	this->textureAddressMap[6] = "textures/spider.png";
+	this->textureAddressMap[7] = "textures/wasp.png";
+	this->textureAddressMap[8] = "textures/wolf.png";
+	this->textureAddressMap[9] = "textures/harpy.png";
+	this->textureAddressMap[10] = "textures/horned rabbit.png";
+
+	//preload textures and store them in a map
+	for (const auto& pair : textureAddressMap)
 	{
-		std::cout << "ERROR::ENEMY::INITSPRITE::Failed to load " << "textures/slime.png" << "!/n";
+		int unique_number = pair.first;
+		const std::string& texture_address = pair.second;
+
+		std::shared_ptr<sf::Texture> texture = std::make_shared<sf::Texture>();
+		if (texture->loadFromFile(texture_address))
+		{
+			this->textureMap[unique_number] = texture;
+		}
+		else
+		{
+			std::cout << "ERROR::ENEMY::INITTEXTURE::Failed to load " << texture_address << '\n';
+		}
 	}
+
+	this->texture = *textureMap[rng.generateRandomNum(1, 10)];
 }
 
 void Enemy::initSprite()
@@ -25,10 +51,10 @@ void Enemy::initSprite()
 }
 
 //constructor
-Enemy::Enemy()
+Enemy::Enemy(RNG& rng) : rng(rng)
 {	
 	this->initVariables();
-	this->initTexture();
+	this->initTextures();
 	this->initSprite();
 }
 
@@ -76,6 +102,17 @@ void Enemy::takeDamage(const float damage_taken)
 	{
 		hpCurrent = 0;
 	}
+}
+
+void Enemy::resetEnemy()
+{
+	this->hpCurrent = hpMax;
+	this->texture = *textureMap[rng.generateRandomNum(1, 10)];
+	this->sprite.setTexture(this->texture);
+}
+
+void Enemy::dropCoins()
+{
 }
 
 //public functions

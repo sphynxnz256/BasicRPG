@@ -3,10 +3,10 @@
 
 int main()
 {
-	//initiate random seed
-	srand(static_cast<unsigned>(time(0)));
+	//create a reusable random number generator
+	RNG rng;
 
-	Game game;
+	Game game(rng);
 
 	//main game loop
 	while (game.getWindow().isOpen())

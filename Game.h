@@ -4,6 +4,7 @@
 #include "Player.h"
 #include "UI.h"
 #include "Animator.h"
+#include "RNG.h"
 
 class Game
 {
@@ -18,6 +19,7 @@ private:
 	Animator* animator;
 
 	bool playAnimation;
+	RNG rng;
 
 	bool mouseHeld;
 	sf::Vector2f mousePosition;
@@ -44,7 +46,7 @@ private:
 
 public:
 	//constructor
-	Game();
+	Game(RNG& rng);
 	//deconstuctor
 	~Game();
 

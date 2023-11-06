@@ -5,7 +5,10 @@
 #include <ctime>
 #include <iostream>
 #include <time.h>
-#include<math.h>
+#include <math.h>
+#include <unordered_map>
+#include <random>
+#include <memory>
 
 //sfml
 #include <SFML/Graphics.hpp>
