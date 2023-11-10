@@ -29,15 +29,18 @@ void Game::initEnemy()
 void Game::initAnimator()
 { 
 	/*this currently is used to play the enemy death animation when its hp reaches 0*/
-	this->animator = new Animator(this->enemy->getSprite());
+	this->animator = new Animator();
+	this->animator->setSprite(this->enemy->getSprite());
 	this->playAnimation = false;
 }
 
 void Game::initUI()
 {
-	/*this currently sets up a hp bar at the top of the screen so current hp can be seen*/
+	//create an hp bar and set its position above the enemy
 	this->ui = new UI();
 	this->ui->setHpBarPosition(this->window.getSize().x, this->enemy->getGlobalBounds().top);
+	this->ui->setCoinsText(this->player->getCoins());
+	this->ui->setDamageText(this->player->getDamage());
 }
 
 void Game::polledEvents()
@@ -53,17 +56,6 @@ void Game::polledEvents()
 }
 
 //private update functions
-void Game::updatePlayer()
-{
-	this->player->update();
-}
-
-void Game::updateEnemy()
-{
-	this->enemy->update();
-}
-
- 
 void Game::updateCombat()
 {
 	/*this checks to see if the player is attacking and determines how much damage the enemy takes.it then
@@ -74,7 +66,7 @@ void Game::updateCombat()
 		{
 			this->mousePosition = sf::Vector2f(static_cast<float>(sf::Mouse::getPosition(this->window).x),
 				static_cast<float>(sf::Mouse::getPosition(this->window).y));
-			if (enemy->getGlobalBounds().contains(mousePosition))
+			if (this->enemy->getGlobalBounds().contains(this->mousePosition))
 			{
 				this->mouseHeld = true;
 				this->enemy->takeDamage(this->player->getDamage());
@@ -88,18 +80,54 @@ void Game::updateCombat()
 		this->mouseHeld = false;
 	}
 
-	/*when the enemy reaches 0 health, this plays a death animation*/
 	if (this->enemy->getHpCurrent() <= 0.f)
 	{
-		this->playAnimation = true;
-		if(animator->getAnimationEnd())
+		this->enemyDeath();
+	}
+}
+
+void Game::enemyDeath()
+{
+	/*when the enemy reaches 0 health, this plays a death animation*/	
+	this->playAnimation = true;
+	if (this->animator->getAnimationEnd())
+	{
+		this->enemy->resetEnemy();
+		this->enemy->setPosition(
+			this->window.getSize().x / 2 - this->enemy->getGlobalBounds().width / 2,
+			this->window.getSize().y / 2 - this->enemy->getGlobalBounds().height / 2);
+		this->animator->resetAnimator(this->enemy->getSprite());
+		this->playAnimation = false;
+		this->ui->setHpBarLength(this->enemy->getHpCurrent(), this->enemy->getHpMax());
+		this->ui->setHpBarColor(this->enemy->getHpCurrent(), this->enemy->getHpMax());
+		this->player->addCoins(rng.generateRandomNum(this->enemy->getCoinsToDrop().first, this->enemy->getCoinsToDrop().second));
+		this->ui->setCoinsText(this->player->getCoins());
+	}	
+}
+
+void Game::updateUI()
+{
+	if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
+	{
+		if (!this->mouseHeld)
 		{
-			this->enemy->resetEnemy();
-			this->animator->resetAnimator(this->enemy->getSprite());
-			this->playAnimation = false;
-			this->ui->setHpBarLength(this->enemy->getHpCurrent(), this->enemy->getHpMax());
-			this->ui->setHpBarColor(this->enemy->getHpCurrent(), this->enemy->getHpMax());
+			this->mousePosition = sf::Vector2f(static_cast<float>(sf::Mouse::getPosition(this->window).x),
+				static_cast<float>(sf::Mouse::getPosition(this->window).y));
+			if (this->ui->getUpgradeGlobalBounds().contains(mousePosition))
+			{
+				this->mouseHeld = true;
+				if(this->player->canUpgrade())
+				{
+					this->player->upgradeDamage();
+					this->ui->setDamageText(this->player->getDamage());
+					this->ui->setCoinsText(this->player->getCoins());
+				}
+			}
 		}
+	}
+	else
+	{
+		this->mouseHeld = false;
 	}
 }
 
@@ -114,11 +142,6 @@ void Game::updateAnimator()
 		this->animator->setPosition(this->window.getSize().x / 2 - this->animator->getGlobalBounds().width / 2,
 			this->window.getSize().y / 2 - this->animator->getGlobalBounds().height / 2);
 	}
-}
-
-void Game::updateUI()
-{
-	this->ui->update();
 }
 
 //private rendering functions
@@ -140,7 +163,7 @@ void Game::renderAnimator()
 
 void Game::renderUI()
 {
-	this->ui->render(this->window);
+	this->ui->render(this->window, this->enemy->getHpCurrent());
 }
 
 //constructor
@@ -172,8 +195,6 @@ void Game::update()
 {
 	this->polledEvents();
 	this->updateCombat();
-	this->updatePlayer();
-	this->updateEnemy();
 	this->updateAnimator();
 	this->updateUI();
 }
@@ -183,14 +204,8 @@ void Game::render()
 	this->window.clear();
 
 	//draw game
-	if(this->enemy->getHpCurrent() > 0.f)
-	{
-		this->renderEnemy();
-	}
-	else
-	{
-		this->renderAnimator();
-	}
+	this->renderEnemy();
+	this->renderAnimator();
 
 	//draw ui
 	this->renderUI();

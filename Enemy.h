@@ -15,6 +15,9 @@ private:
 
 	float hpMax;
 	float hpCurrent;
+	std::pair<float, float> spriteScale;
+
+	std::pair<int, int> coinsToDrop;
 
 	//private functions
 	void initVariables();
@@ -30,9 +33,10 @@ public:
 	//getters
 	const sf::Vector2f getPosition() const;
 	const sf::FloatRect getGlobalBounds() const;
-	const int getHpMax() const;
-	const int getHpCurrent() const;
-	const sf::Sprite& getSprite() const;
+	const float getHpMax() const;
+	const float getHpCurrent() const;
+	sf::Sprite* getSprite();
+	const std::pair<int, int> getCoinsToDrop() const;
 
 	//setters
 	void setPosition(const float x, const float y);
@@ -40,9 +44,7 @@ public:
 	
 	//public functions
 	void resetEnemy();
-	void dropCoins();
 
-	void update();
 	void render(sf::RenderTarget& target);
 };
 

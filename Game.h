@@ -17,9 +17,8 @@ private:
 	Enemy* enemy;
 	UI* ui;
 	Animator* animator;
-
 	bool playAnimation;
-	RNG rng;
+	RNG& rng;
 
 	bool mouseHeld;
 	sf::Vector2f mousePosition;
@@ -33,11 +32,10 @@ private:
 
 	//private update functions
 	void polledEvents();
-	void updatePlayer();
-	void updateEnemy();
 	void updateCombat();
-	void updateAnimator();
+	void enemyDeath();
 	void updateUI();
+	void updateAnimator();
 
 	//private rendering functions
 	void renderEnemy();

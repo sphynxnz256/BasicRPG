@@ -6,11 +6,15 @@ class UI
 {
 private:
 	sf::RectangleShape hpMaxBar;
-	sf::RectangleShape hpCurrentBar;
+	sf::RectangleShape hpCurrentBar;	
 
 	sf::Font font;
-	sf::Text coins;
-	sf::Text damage;
+
+	sf::Text coinsText;
+	sf::Text damageText;
+
+	sf::RectangleShape upgradeButton;
+	sf::Text upgradeButtonText;
 
 
 
@@ -18,6 +22,7 @@ private:
 	void initHpBar();
 	void initFonts();
 	void initText();
+	void initUpgradeButton();
 
 public:
 	//constructor
@@ -25,15 +30,17 @@ public:
 	//deconstructor
 	~UI();
 
+	//getters
+	sf::FloatRect getUpgradeGlobalBounds();
+
 	//setters
 	void setHpBarPosition(const float target_x, const float enemy_top);
 	void setHpBarColor(const float current_hp,const float max_hp);
 	void setHpBarLength(const float current_hp, const float max_hp);
+	void setCoinsText(const int coins);
+	void setDamageText(const float damage);
 
 	//public functions
-	void update();
-	void render(sf::RenderTarget& target);
-
-
+	void render(sf::RenderTarget& target, float current_hp);
 };
 

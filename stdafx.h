@@ -1,14 +1,12 @@
 #pragma once
 
 //standard
-#include <cstdlib>
-#include <ctime>
 #include <iostream>
-#include <time.h>
-#include <math.h>
 #include <unordered_map>
 #include <random>
 #include <memory>
+#include <utility>
+#include <sstream>
 
 //sfml
 #include <SFML/Graphics.hpp>

@@ -5,7 +5,7 @@
 /*the animator class plays animations*/
 
 //private initation functions
-void Animator::initSrite(sf::Sprite sprite)
+void Animator::initSrite(sf::Sprite* sprite)
 {
 	this->sprite = sprite;
 }
@@ -19,35 +19,34 @@ void Animator::initFlags()
 void Animator::updateAnimation()
 {
 	
-	if (firstFrame)
+	if (this->firstFrame)
 	{
 		/*a hack to fix first frame issue where first calculation
 		of dt is too large*/
-		firstFrame = false;
+		this->firstFrame = false;
 		this->dt = dtClock.restart().asSeconds();
 	}
-	else if(this->sprite.getScale().x > 0.001)
+	else if(this->sprite->getScale().x > 0.001)
 	{
 		/*death animation. shrinks the enemy to nothing*/
-		this->speed = 7.f;
+		this->speed = 10.f;
 
 		this->dt = dtClock.restart().asSeconds();
-		this->currentScale = this->sprite.getScale();
+		this->currentScale = this->sprite->getScale();
 		this->newScale = currentScale - currentScale * dt * speed;
 
-		this->sprite.setScale(newScale);
+		this->sprite->setScale(newScale);
 	}
 	else
 	{
-		this->sprite.setScale(0.f, 0.f);
+		this->sprite->setScale(0.f, 0.f);
 		this->animationEnd = true;
 	}
 }
 
 //constructor
-Animator::Animator(sf::Sprite sprite)
+Animator::Animator()
 {
-	this->initSrite(sprite);
 	this->initFlags();
 }
 
@@ -59,7 +58,7 @@ Animator::~Animator()
 //getters
 const sf::FloatRect& Animator::getGlobalBounds() const
 {
-	return sprite.getGlobalBounds();
+		return this->sprite->getGlobalBounds();
 }
 
 const bool Animator::getAnimationEnd() const
@@ -70,11 +69,16 @@ const bool Animator::getAnimationEnd() const
 //setters
 void Animator::setPosition(float x, float y)
 {
-	sprite.setPosition(x, y);
+	this->sprite->setPosition(x, y);
+}
+
+void Animator::setSprite(sf::Sprite* sprite)
+{
+	this->sprite = sprite;
 }
 
 //public functions
-void Animator::resetAnimator(sf::Sprite sprite)
+void Animator::resetAnimator(sf::Sprite* sprite)
 {
 	this->animationEnd = false;
 	this->firstFrame = true;
@@ -89,5 +93,5 @@ void Animator::update()
 
 void Animator::render(sf::RenderTarget& target)
 {
-	target.draw(this->sprite);
+	target.draw(*this->sprite);
 }

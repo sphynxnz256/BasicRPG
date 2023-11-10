@@ -6,7 +6,8 @@ private:
 	float damage;
 	float attackCDMax;
 	float attackCD;
-	float coins;
+	int coins;
+	int upgradeCost;
 
 	//private functions
 	void initVariables();
@@ -19,13 +20,13 @@ public:
 
 	//getters
 	const float getDamage() const;
-	const float getCoins() const;
+	const int getCoins() const;
 
 	//setters
-	void addDamage(float damage_to_add);
-	void addCoins(float coins_to_add);
+	void upgradeDamage();
+	void addCoins(int coins_to_add);
 
 	//public functions
-	void update();
+	bool canUpgrade();
 };
 

@@ -3,7 +3,7 @@ class Animator
 {
 private:
 	//private variables
-	sf::Sprite sprite;
+	sf::Sprite* sprite;
 
 	sf::Vector2f currentScale;
 	sf::Vector2f targetScale;
@@ -17,7 +17,7 @@ private:
 	float speed;
 
 	//private initation functions
-	void initSrite(sf::Sprite sprite);
+	void initSrite(sf::Sprite* sprite);
 	void initFlags();
 
 	//private update functions
@@ -25,7 +25,7 @@ private:
 
 public:
 	//constructor
-	Animator(sf::Sprite sprite);
+	Animator();
 	//deconstructor
 	~Animator();
 
@@ -35,9 +35,10 @@ public:
 
 	//setters
 	void setPosition(float x, float y);
+	void setSprite(sf::Sprite* sprite);
 
 	//public functions
-	void resetAnimator(sf::Sprite sprite);
+	void resetAnimator(sf::Sprite* sprite);
 
 	void update();
 	void render(sf::RenderTarget& target);

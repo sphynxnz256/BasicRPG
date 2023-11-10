@@ -6,8 +6,10 @@
 //private functions	
 void Enemy::initVariables()
 {
-	hpMax = 10.f;
-	hpCurrent = hpMax;
+	this->hpMax = 10.f;
+	this->hpCurrent = this->hpMax;
+	this->coinsToDrop = std::make_pair(1, 2);
+	this->spriteScale = std::make_pair(0.5f, 0.5f);
 }
 
 void Enemy::initTextures()
@@ -41,13 +43,13 @@ void Enemy::initTextures()
 		}
 	}
 
-	this->texture = *textureMap[rng.generateRandomNum(1, 10)];
+	this->texture = *this->textureMap[rng.generateRandomNum(1, 10)];
 }
 
 void Enemy::initSprite()
 {
 	this->sprite.setTexture(this->texture);
-	this->sprite.setScale(0.5f, 0.5f);
+	this->sprite.setScale(spriteScale.first, spriteScale.second);
 }
 
 //constructor
@@ -74,19 +76,24 @@ const sf::FloatRect Enemy::getGlobalBounds() const
 	return sprite.getGlobalBounds();
 }
 
-const int Enemy::getHpMax() const
+const float Enemy::getHpMax() const
 {
 	return this->hpMax;
 }
 
-const int Enemy::getHpCurrent() const
+const float Enemy::getHpCurrent() const
 {
 	return this->hpCurrent;
 }
 
-const sf::Sprite& Enemy::getSprite() const
+sf::Sprite* Enemy::getSprite()
 {
-	return this->sprite;
+	return &this->sprite;
+}
+
+const std::pair<int, int> Enemy::getCoinsToDrop() const
+{
+	return this->coinsToDrop;
 }
 
 //setters
@@ -98,26 +105,18 @@ void Enemy::setPosition(const float x, const float y)
 void Enemy::takeDamage(const float damage_taken)
 {
 	this->hpCurrent -= damage_taken;
-	if (hpCurrent < 0)
+	if (this->hpCurrent < 0)
 	{
-		hpCurrent = 0;
+		this->hpCurrent = 0;
 	}
 }
 
 void Enemy::resetEnemy()
 {
-	this->hpCurrent = hpMax;
-	this->texture = *textureMap[rng.generateRandomNum(1, 10)];
+	this->hpCurrent = this->hpMax;
+	this->texture = *this->textureMap[rng.generateRandomNum(1, 10)];
 	this->sprite.setTexture(this->texture);
-}
-
-void Enemy::dropCoins()
-{
-}
-
-//public functions
-void Enemy::update()
-{
+	this->sprite.setScale(spriteScale.first, spriteScale.second);
 }
 
 void Enemy::render(sf::RenderTarget& target)

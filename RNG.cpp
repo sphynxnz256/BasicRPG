@@ -8,7 +8,7 @@ RNG::RNG() : generator(std::random_device()()) {}
 int RNG::generateRandomNum(int min, int max)
 {
 	std::uniform_int_distribution<int> distribution(min, max);
-	return distribution(generator);
+	return distribution(this->generator);
 }
 
 
