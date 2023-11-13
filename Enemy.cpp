@@ -9,22 +9,17 @@ void Enemy::initVariables()
 	this->hpMax = 10.f;
 	this->hpCurrent = this->hpMax;
 	this->coinsToDrop = std::make_pair(1, 2);
-	this->spriteScale = std::make_pair(0.5f, 0.5f);
+	this->spriteScale = std::make_pair(0.25f, 0.25f);
 }
 
 void Enemy::initTextures()
 {
 	//store addresses of textures in map	
-	this->textureAddressMap[1] = "textures/slime.png";
-	this->textureAddressMap[2] = "textures/crab.png";
-	this->textureAddressMap[3] = "textures/rat.png";
-	this->textureAddressMap[4] = "textures/raven.png";
-	this->textureAddressMap[5] = "textures/mushroom monster.png";
-	this->textureAddressMap[6] = "textures/spider.png";
-	this->textureAddressMap[7] = "textures/wasp.png";
-	this->textureAddressMap[8] = "textures/wolf.png";
-	this->textureAddressMap[9] = "textures/harpy.png";
-	this->textureAddressMap[10] = "textures/horned rabbit.png";
+	this->textureAddressMap[1] = "textures/enemies/slime.png";
+	this->textureAddressMap[2] = "textures/enemies/crab.png";
+	this->textureAddressMap[3] = "textures/enemies/rat.png";
+	this->textureAddressMap[4] = "textures/enemies/raven.png";
+	this->textureAddressMap[5] = "textures/enemies/wasp.png";
 
 	//preload textures and store them in a map
 	for (const auto& pair : textureAddressMap)
@@ -43,7 +38,7 @@ void Enemy::initTextures()
 		}
 	}
 
-	this->texture = *this->textureMap[rng.generateRandomNum(1, 10)];
+	this->texture = *this->textureMap[rng.generateRandomNum(1, 5)];
 }
 
 void Enemy::initSprite()
@@ -114,7 +109,7 @@ void Enemy::takeDamage(const float damage_taken)
 void Enemy::resetEnemy()
 {
 	this->hpCurrent = this->hpMax;
-	this->texture = *this->textureMap[rng.generateRandomNum(1, 10)];
+	this->texture = *this->textureMap[rng.generateRandomNum(1, 5)];
 	this->sprite.setTexture(this->texture);
 	this->sprite.setScale(spriteScale.first, spriteScale.second);
 }

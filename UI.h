@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Enemy.h"
+#include "Button.h"
 
 class UI
 {
@@ -12,11 +13,9 @@ private:
 
 	sf::Text coinsText;
 	sf::Text damageText;
+	sf::Text upgradeCostText;
 
-	sf::RectangleShape upgradeButton;
-	sf::Text upgradeButtonText;
-
-
+	Button upgradeButton;
 
 	//private functions
 	void initHpBar();
@@ -30,17 +29,16 @@ public:
 	//deconstructor
 	~UI();
 
-	//getters
-	sf::FloatRect getUpgradeGlobalBounds();
-
 	//setters
 	void setHpBarPosition(const float target_x, const float enemy_top);
 	void setHpBarColor(const float current_hp,const float max_hp);
 	void setHpBarLength(const float current_hp, const float max_hp);
 	void setCoinsText(const int coins);
 	void setDamageText(const float damage);
+	void setUpgradeCostText(const int upgrade_cost);
 
 	//public functions
-	void render(sf::RenderTarget& target, float current_hp);
+	bool upgradeButtonCLicked(sf::Vector2f mouse_pos);
+	void render(sf::RenderTarget& target, float current_hp, const sf::Vector2f& mouse_pos);
 };
 

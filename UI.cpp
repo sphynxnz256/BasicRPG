@@ -6,9 +6,9 @@
 //private functions
 void UI::initHpBar()
 {
-	this->hpMaxBar.setSize(sf::Vector2f(200.f, 20.f));
+	this->hpMaxBar.setSize(sf::Vector2f(130.f, 20.f));
 	this->hpMaxBar.setFillColor(sf::Color(200, 200, 200, 100));
-	this->hpMaxBar.setOutlineColor(sf::Color(100, 100, 100, 200));
+	this->hpMaxBar.setOutlineColor(sf::Color::Black);
 	this->hpMaxBar.setOutlineThickness(1.f);
 
 	this->hpCurrentBar.setSize(hpMaxBar.getSize());
@@ -39,30 +39,35 @@ void UI::initText()
 	this->damageText.setOutlineColor(sf::Color::Black);
 	this->damageText.setOutlineThickness(1.f);
 	this->damageText.setString("Damage: not set");
-	this->damageText.setPosition(20.f, this->coinsText.getGlobalBounds().height + 40.f);
+	this->damageText.setPosition(20.f, this->coinsText.getPosition().y + this->coinsText.getGlobalBounds().height + 10.f);
+
+	//displays current cost of upgrade
+	this->upgradeCostText.setFont(font); 
+	this->upgradeCostText.setCharacterSize(16);
+	this->upgradeCostText.setOutlineColor(sf::Color::Black);
+	this->upgradeCostText.setOutlineThickness(1.f);
+	this->upgradeCostText.setString("Upgrade Cost: not set");
 }
 
 void UI::initUpgradeButton()
 {
-	//displays the button to upgrade damage
-	this->upgradeButton.setSize(sf::Vector2f(100.f, 30.f));
-	this->upgradeButton.setFillColor(sf::Color(200, 200, 200, 255));
-	this->upgradeButton.setOutlineColor(sf::Color(100, 100, 100, 255));
-	this->upgradeButton.setOutlineThickness(5.f);
-	this->upgradeButton.setPosition(30.f,
-		this->damageText.getGlobalBounds().height + this->damageText.getPosition().y + 40.f);
+	float pos_x = 20.f;
+	float pos_y = this->damageText.getPosition().y + this->damageText.getGlobalBounds().height + 10.f;
+	float width = 100.f;
+	float height = 30.f;
+	sf::Color idle_color = sf::Color(100, 100, 100, 255);
+	sf::Color hover_color = sf::Color(50, 50, 50, 255);
+	std::string text = "Upgrade";
+	int character_size = 20;
 
-	this->upgradeButtonText.setFont(font);
-	this->upgradeButtonText.setString("upgrade");
-	this->upgradeButtonText.setCharacterSize(20);
-	this->upgradeButtonText.setOutlineColor(sf::Color::Black);
-	this->upgradeButtonText.setFillColor(sf::Color::Black);
-	this->upgradeButtonText.setPosition(upgradeButton.getPosition().x + 12, upgradeButton.getPosition().y + 2); //there is a freakin button class. lets use that :/
+	this->upgradeButton = Button(pos_x, pos_y, width, height,
+		idle_color, hover_color, text, font, character_size);
+
+	//set upgrade cost text position once upgrade button's position is set
+	this->upgradeCostText.setPosition(20.f, this->upgradeButton.getPosition().y + this->upgradeButton.getGlobalBounds().height + 5.f);
 }
 
-
-
-//constructor
+//constructors
 UI::UI()
 {
 	this->initHpBar();
@@ -74,11 +79,6 @@ UI::UI()
 //deconstructor
 UI::~UI()
 {
-}
-
-sf::FloatRect UI::getUpgradeGlobalBounds()
-{
-	return this->upgradeButton.getGlobalBounds();
 }
 
 //setters
@@ -121,16 +121,34 @@ void UI::setDamageText(const float damage)
 	this->damageText.setString(ss.str());
 }
 
+void UI::setUpgradeCostText(const int upgrade_cost)
+{
+	std::stringstream ss;
+	ss << "Upgrade Cost: " << upgrade_cost << " coins\n";
+	this->upgradeCostText.setString(ss.str());
+}
+
+bool UI::upgradeButtonCLicked(sf::Vector2f mouse_pos)
+{
+	return upgradeButton.isClicked(mouse_pos);
+}
+
 //public functions
-void UI::render(sf::RenderTarget& target, float current_hp) 
+void UI::render(sf::RenderTarget& target, float current_hp, const sf::Vector2f& mouse_pos)
 {
 	if(current_hp > 0)
 	{
 		target.draw(this->hpMaxBar);
 		target.draw(this->hpCurrentBar);
 	}
+
 	target.draw(this->coinsText);
 	target.draw(this->damageText);
-	target.draw(this->upgradeButton);
-	target.draw(this->upgradeButtonText);
+
+	upgradeButton.draw(target, mouse_pos); 
+	if(upgradeButton.isMouseOver(mouse_pos))
+	{
+		target.draw(this->upgradeCostText);
+	}
+	
 }

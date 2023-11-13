@@ -21,6 +21,7 @@ public:
 	//getters
 	const float getDamage() const;
 	const int getCoins() const;
+	const int getUpgradeCost() const;
 
 	//setters
 	void upgradeDamage();

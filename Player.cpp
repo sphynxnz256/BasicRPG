@@ -35,6 +35,11 @@ const int Player::getCoins() const
 	return this->coins;
 }
 
+const int Player::getUpgradeCost() const
+{
+	return this->upgradeCost;
+}
+
 void Player::upgradeDamage()
 {
 	this->damage *= 2.f;

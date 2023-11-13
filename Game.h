@@ -23,11 +23,15 @@ private:
 	bool mouseHeld;
 	sf::Vector2f mousePosition;
 
+	sf::Texture backgroundTexture;
+	sf::Sprite background;
+
 	//private initiation functions
 	void initWindow();
 	void initPlayer();
 	void initEnemy();
 	void initAnimator();
+	void initBackground();
 	void initUI();
 
 	//private update functions
@@ -40,6 +44,7 @@ private:
 	//private rendering functions
 	void renderEnemy();
 	void renderAnimator();
+	void renderBackground();
 	void renderUI();
 
 public:

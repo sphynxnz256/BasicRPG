@@ -6,20 +6,20 @@
 //private initiation functions
 void Game::initWindow()
 {
-	/*create game window*/
+	/*creates the game window*/
 	this->window.create(sf::VideoMode(800, 600), "Basic RPG", sf::Style::Close | sf::Style::Titlebar);
 }
 
 void Game::initPlayer()
 {
-	/*this is used to control when the player can attack and holds our player state*/
+	/*holds player state*/
 	this->player = new Player();
 	this->mouseHeld = false;
 }
 
 void Game::initEnemy()
 {
-	/*this will hold our enemy state*/
+	/*stores enemy state*/
 	this->enemy = new Enemy(rng);
 	this->enemy->setPosition(
 		this->window.getSize().x /2 - this->enemy->getGlobalBounds().width / 2, 
@@ -28,10 +28,20 @@ void Game::initEnemy()
 
 void Game::initAnimator()
 { 
-	/*this currently is used to play the enemy death animation when its hp reaches 0*/
+	/*plays the enemy death animation when its hp reaches 0*/
 	this->animator = new Animator();
 	this->animator->setSprite(this->enemy->getSprite());
 	this->playAnimation = false;
+}
+
+void Game::initBackground()
+{
+	/*sets the background*/
+	if (this->backgroundTexture.loadFromFile("textures/backgrounds/beach.png"))
+	{
+		std::cout << "ERROR::GAME::INITBACKGROUND::Can't load beach.png";
+	}
+	this->background.setTexture(backgroundTexture);
 }
 
 void Game::initUI()
@@ -41,6 +51,7 @@ void Game::initUI()
 	this->ui->setHpBarPosition(this->window.getSize().x, this->enemy->getGlobalBounds().top);
 	this->ui->setCoinsText(this->player->getCoins());
 	this->ui->setDamageText(this->player->getDamage());
+	this->ui->setUpgradeCostText(this->player->getUpgradeCost());
 }
 
 void Game::polledEvents()
@@ -107,27 +118,27 @@ void Game::enemyDeath()
 
 void Game::updateUI()
 {
-	if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
+	/*when clicked and when the player has enough coins, upgrade the players damage and set the UI
+	to reflect this*/
+	this->mousePosition = sf::Vector2f(static_cast<float>(sf::Mouse::getPosition(this->window).x),
+		static_cast<float>(sf::Mouse::getPosition(this->window).y));
+	if (this->ui->upgradeButtonCLicked(mousePosition))
 	{
 		if (!this->mouseHeld)
 		{
-			this->mousePosition = sf::Vector2f(static_cast<float>(sf::Mouse::getPosition(this->window).x),
-				static_cast<float>(sf::Mouse::getPosition(this->window).y));
-			if (this->ui->getUpgradeGlobalBounds().contains(mousePosition))
+			this->mouseHeld = true;
+			if (this->player->canUpgrade())
 			{
-				this->mouseHeld = true;
-				if(this->player->canUpgrade())
-				{
-					this->player->upgradeDamage();
-					this->ui->setDamageText(this->player->getDamage());
-					this->ui->setCoinsText(this->player->getCoins());
-				}
+				this->player->upgradeDamage();
+				this->ui->setDamageText(this->player->getDamage());
+				this->ui->setCoinsText(this->player->getCoins());
+				this->ui->setUpgradeCostText(this->player->getUpgradeCost());
 			}
 		}
-	}
-	else
-	{
-		this->mouseHeld = false;
+		else
+		{
+			this->mouseHeld = false;
+		}
 	}
 }
 
@@ -161,15 +172,23 @@ void Game::renderAnimator()
 	}
 }
 
+void Game::renderBackground()
+{
+	this->window.draw(this->background);
+}
+
 void Game::renderUI()
 {
-	this->ui->render(this->window, this->enemy->getHpCurrent());
+	this->mousePosition = sf::Vector2f(static_cast<float>(sf::Mouse::getPosition(this->window).x),
+		static_cast<float>(sf::Mouse::getPosition(this->window).y));
+	this->ui->render(this->window, this->enemy->getHpCurrent(), this->mousePosition);
 }
 
 //constructor
 Game::Game(RNG& rng) : rng(rng)
 {
 	this->initWindow();
+	this->initBackground();
 	this->initEnemy();
 	this->initPlayer();
 	this->initAnimator();
@@ -204,8 +223,10 @@ void Game::render()
 	this->window.clear();
 
 	//draw game
+	this->renderBackground();
 	this->renderEnemy();
 	this->renderAnimator();
+	
 
 	//draw ui
 	this->renderUI();
