@@ -17,3 +17,22 @@ int main()
 
 	return 0;
 }
+
+/*to do
+-bosses
+	-timer
+	-more hp
+	-more loots
+
+-levels
+	-everything has more hp
+	-new enemies
+	-more loots
+
+-saving games
+
+-menu screen
+	-load game
+	-new game
+	-exit etc
+*/
