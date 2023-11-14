@@ -26,18 +26,27 @@ void Game::initEnemy()
 		this->window.getSize().y / 2 - this->enemy->getGlobalBounds().height / 2);
 }
 
+void Game::initBoss()
+{
+	this->killCounter = 0;
+	this->boss = new Boss();
+	this->boss->setPosition( 
+		this->window.getSize().x / 2 - this->boss->getGlobalBounds().width / 2, 
+		this->window.getSize().y / 2 - this->boss->getGlobalBounds().height / 2); 
+	this->bossActive = false;
+}
+
 void Game::initAnimator()
 { 
 	/*plays the enemy death animation when its hp reaches 0*/
 	this->animator = new Animator();
-	this->animator->setSprite(this->enemy->getSprite());
 	this->playAnimation = false;
 }
 
 void Game::initBackground()
 {
 	/*sets the background*/
-	if (this->backgroundTexture.loadFromFile("textures/backgrounds/beach.png"))
+	if (!this->backgroundTexture.loadFromFile("textures/backgrounds/beach.png"))
 	{
 		std::cout << "ERROR::GAME::INITBACKGROUND::Can't load beach.png";
 	}
@@ -77,8 +86,15 @@ void Game::updateCombat()
 		{
 			this->mousePosition = sf::Vector2f(static_cast<float>(sf::Mouse::getPosition(this->window).x),
 				static_cast<float>(sf::Mouse::getPosition(this->window).y));
-			if (this->enemy->getGlobalBounds().contains(this->mousePosition))
+			if (this->bossActive && this->boss->getGlobalBounds().contains(this->mousePosition))
 			{
+				this->mouseHeld = true;
+				this->boss->takeDamage(this->player->getDamage());
+				this->ui->setHpBarColor(this->boss->getHpCurrent(), this->boss->getHpMax());
+				this->ui->setHpBarLength(this->boss->getHpCurrent(), this->boss->getHpMax());
+			}
+			else if (this->enemy->getGlobalBounds().contains(this->mousePosition))
+			{				
 				this->mouseHeld = true;
 				this->enemy->takeDamage(this->player->getDamage());
 				this->ui->setHpBarColor(this->enemy->getHpCurrent(), this->enemy->getHpMax());
@@ -91,29 +107,63 @@ void Game::updateCombat()
 		this->mouseHeld = false;
 	}
 
-	if (this->enemy->getHpCurrent() <= 0.f)
+	if (this->bossActive && this->boss->getHpCurrent() <= 0.f)
 	{
+		this->animator->setSprite(this->boss->getSprite());
+		this->bossDeath();
+	}
+	else if (this->enemy->getHpCurrent() <= 0.f)		
+	{
+		this->animator->setSprite(this->enemy->getSprite());
 		this->enemyDeath();
 	}
 }
 
 void Game::enemyDeath()
 {
-	/*when the enemy reaches 0 health, this plays a death animation*/	
+	/*when the enemy reaches 0 health, this plays a death animation*/
 	this->playAnimation = true;
 	if (this->animator->getAnimationEnd())
 	{
+		this->killCounter++;
 		this->enemy->resetEnemy();
 		this->enemy->setPosition(
 			this->window.getSize().x / 2 - this->enemy->getGlobalBounds().width / 2,
 			this->window.getSize().y / 2 - this->enemy->getGlobalBounds().height / 2);
-		this->animator->resetAnimator(this->enemy->getSprite());
+		this->animator->resetAnimator();
 		this->playAnimation = false;
 		this->ui->setHpBarLength(this->enemy->getHpCurrent(), this->enemy->getHpMax());
 		this->ui->setHpBarColor(this->enemy->getHpCurrent(), this->enemy->getHpMax());
 		this->player->addCoins(rng.generateRandomNum(this->enemy->getCoinsToDrop().first, this->enemy->getCoinsToDrop().second));
 		this->ui->setCoinsText(this->player->getCoins());
-	}	
+
+		if (this->killCounter >= 10)
+		{
+			this->killCounter = 0;
+			this->bossActive = true;
+			this->ui->setHpBarPosition(this->window.getSize().x, this->boss->getGlobalBounds().top);
+		}
+	}		
+}
+
+void Game::bossDeath()
+{
+	this->playAnimation = true;
+	if (this->animator->getAnimationEnd())
+	{
+		this->boss->resetBoss();
+		this->bossActive = false;
+		this->boss->setPosition(
+			this->window.getSize().x / 2 - this->boss->getGlobalBounds().width / 2,
+			this->window.getSize().y / 2 - this->boss->getGlobalBounds().height / 2);
+		this->animator->resetAnimator();
+		this->playAnimation = false;
+		this->ui->setHpBarLength(this->boss->getHpCurrent(), this->boss->getHpMax());
+		this->ui->setHpBarColor(this->boss->getHpCurrent(), this->boss->getHpMax());
+		this->player->addCoins(rng.generateRandomNum(this->boss->getCoinsToDrop().first, this->boss->getCoinsToDrop().second));
+		this->ui->setCoinsText(this->player->getCoins());
+		this->ui->setHpBarPosition(this->window.getSize().x, this->enemy->getGlobalBounds().top);
+	}
 }
 
 void Game::updateUI()
@@ -142,7 +192,6 @@ void Game::updateUI()
 	}
 }
 
-
 void Game::updateAnimator()
 {
 	/*triggered when the enemy reaches 0 hp, play a death animation and make sure the animation sprite stays
@@ -158,9 +207,17 @@ void Game::updateAnimator()
 //private rendering functions
 void Game::renderEnemy()
 {
-	if(!playAnimation)
+	if(!this->playAnimation && !this->bossActive)
 	{
 		this->enemy->render(this->window);
+	}
+}
+
+void Game::renderBoss()
+{
+	if (this->bossActive)
+	{
+		this->boss->render(this->window);
 	}
 }
 
@@ -190,6 +247,7 @@ Game::Game(RNG& rng) : rng(rng)
 	this->initWindow();
 	this->initBackground();
 	this->initEnemy();
+	this->initBoss();
 	this->initPlayer();
 	this->initAnimator();
 	this->initUI();
@@ -200,6 +258,7 @@ Game::~Game()
 {
 	delete this->player;
 	delete this->enemy;
+	delete this->boss;
 	delete this->ui;
 }
 
@@ -225,6 +284,7 @@ void Game::render()
 	//draw game
 	this->renderBackground();
 	this->renderEnemy();
+	this->renderBoss();
 	this->renderAnimator();
 	
 

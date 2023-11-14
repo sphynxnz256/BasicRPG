@@ -21,8 +21,6 @@ int main()
 /*to do
 -bosses
 	-timer
-	-more hp
-	-more loots
 
 -levels
 	-everything has more hp

@@ -5,11 +5,6 @@
 /*the animator class plays animations*/
 
 //private initation functions
-void Animator::initSrite(sf::Sprite* sprite)
-{
-	this->sprite = sprite;
-}
-
 void Animator::initFlags()
 {
 	this->firstFrame = true;
@@ -17,8 +12,7 @@ void Animator::initFlags()
 }
 
 void Animator::updateAnimation()
-{
-	
+{	
 	if (this->firstFrame)
 	{
 		/*a hack to fix first frame issue where first calculation
@@ -78,12 +72,10 @@ void Animator::setSprite(sf::Sprite* sprite)
 }
 
 //public functions
-void Animator::resetAnimator(sf::Sprite* sprite)
+void Animator::resetAnimator()
 {
 	this->animationEnd = false;
 	this->firstFrame = true;
-	this->sprite = sprite;
-
 }
 
 void Animator::update()

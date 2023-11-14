@@ -17,7 +17,6 @@ private:
 	float speed;
 
 	//private initation functions
-	void initSrite(sf::Sprite* sprite);
 	void initFlags();
 
 	//private update functions
@@ -38,7 +37,7 @@ public:
 	void setSprite(sf::Sprite* sprite);
 
 	//public functions
-	void resetAnimator(sf::Sprite* sprite);
+	void resetAnimator();
 
 	void update();
 	void render(sf::RenderTarget& target);

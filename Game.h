@@ -2,6 +2,7 @@
 
 #include "Enemy.h"
 #include "Player.h"
+#include "Boss.h"
 #include "UI.h"
 #include "Animator.h"
 #include "RNG.h"
@@ -15,6 +16,7 @@ private:
 
 	Player* player;
 	Enemy* enemy;
+	Boss* boss;
 	UI* ui;
 	Animator* animator;
 	bool playAnimation;
@@ -26,10 +28,14 @@ private:
 	sf::Texture backgroundTexture;
 	sf::Sprite background;
 
+	int killCounter;
+	bool bossActive;
+
 	//private initiation functions
 	void initWindow();
 	void initPlayer();
 	void initEnemy();
+	void initBoss();
 	void initAnimator();
 	void initBackground();
 	void initUI();
@@ -37,15 +43,19 @@ private:
 	//private update functions
 	void polledEvents();
 	void updateCombat();
-	void enemyDeath();
 	void updateUI();
 	void updateAnimator();
 
 	//private rendering functions
 	void renderEnemy();
+	void renderBoss();
 	void renderAnimator();
 	void renderBackground();
 	void renderUI();
+
+	//other private functions
+	void enemyDeath();
+	void bossDeath();
 
 public:
 	//constructor
