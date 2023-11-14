@@ -3,10 +3,10 @@
 
 int main()
 {
-	//initiate random seed
-	srand(static_cast<unsigned>(time(0)));
+	//create a reusable random number generator
+	RNG rng;
 
-	Game game;
+	Game game(rng);
 
 	//main game loop
 	while (game.getWindow().isOpen())
@@ -17,3 +17,22 @@ int main()
 
 	return 0;
 }
+
+/*to do
+-bosses
+	-timer
+	-more hp
+	-more loots
+
+-levels
+	-everything has more hp
+	-new enemies
+	-more loots
+
+-saving games
+
+-menu screen
+	-load game
+	-new game
+	-exit etc
+*/

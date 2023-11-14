@@ -4,6 +4,7 @@
 #include "Player.h"
 #include "UI.h"
 #include "Animator.h"
+#include "RNG.h"
 
 class Game
 {
@@ -16,35 +17,39 @@ private:
 	Enemy* enemy;
 	UI* ui;
 	Animator* animator;
-
 	bool playAnimation;
+	RNG& rng;
 
 	bool mouseHeld;
 	sf::Vector2f mousePosition;
+
+	sf::Texture backgroundTexture;
+	sf::Sprite background;
 
 	//private initiation functions
 	void initWindow();
 	void initPlayer();
 	void initEnemy();
 	void initAnimator();
+	void initBackground();
 	void initUI();
 
 	//private update functions
 	void polledEvents();
-	void updatePlayer();
-	void updateEnemy();
 	void updateCombat();
-	void updateAnimator();
+	void enemyDeath();
 	void updateUI();
+	void updateAnimator();
 
 	//private rendering functions
 	void renderEnemy();
 	void renderAnimator();
+	void renderBackground();
 	void renderUI();
 
 public:
 	//constructor
-	Game();
+	Game(RNG& rng);
 	//deconstuctor
 	~Game();
 

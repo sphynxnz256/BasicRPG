@@ -6,29 +6,52 @@
 //private functions	
 void Enemy::initVariables()
 {
-	hpMax = 10.f;
-	hpCurrent = hpMax;
+	this->hpMax = 10.f;
+	this->hpCurrent = this->hpMax;
+	this->coinsToDrop = std::make_pair(1, 2);
+	this->spriteScale = std::make_pair(0.25f, 0.25f);
 }
 
-void Enemy::initTexture()
+void Enemy::initTextures()
 {
-	if (!this->texture.loadFromFile("textures/slime.png"))
+	//store addresses of textures in map	
+	this->textureAddressMap[1] = "textures/enemies/slime.png";
+	this->textureAddressMap[2] = "textures/enemies/crab.png";
+	this->textureAddressMap[3] = "textures/enemies/rat.png";
+	this->textureAddressMap[4] = "textures/enemies/raven.png";
+	this->textureAddressMap[5] = "textures/enemies/wasp.png";
+
+	//preload textures and store them in a map
+	for (const auto& pair : textureAddressMap)
 	{
-		std::cout << "ERROR::ENEMY::INITSPRITE::Failed to load " << "textures/slime.png" << "!/n";
+		int unique_number = pair.first;
+		const std::string& texture_address = pair.second;
+
+		std::shared_ptr<sf::Texture> texture = std::make_shared<sf::Texture>();
+		if (texture->loadFromFile(texture_address))
+		{
+			this->textureMap[unique_number] = texture;
+		}
+		else
+		{
+			std::cout << "ERROR::ENEMY::INITTEXTURE::Failed to load " << texture_address << '\n';
+		}
 	}
+
+	this->texture = *this->textureMap[rng.generateRandomNum(1, 5)];
 }
 
 void Enemy::initSprite()
 {
 	this->sprite.setTexture(this->texture);
-	this->sprite.setScale(0.5f, 0.5f);
+	this->sprite.setScale(spriteScale.first, spriteScale.second);
 }
 
 //constructor
-Enemy::Enemy()
+Enemy::Enemy(RNG& rng) : rng(rng)
 {	
 	this->initVariables();
-	this->initTexture();
+	this->initTextures();
 	this->initSprite();
 }
 
@@ -48,19 +71,24 @@ const sf::FloatRect Enemy::getGlobalBounds() const
 	return sprite.getGlobalBounds();
 }
 
-const int Enemy::getHpMax() const
+const float Enemy::getHpMax() const
 {
 	return this->hpMax;
 }
 
-const int Enemy::getHpCurrent() const
+const float Enemy::getHpCurrent() const
 {
 	return this->hpCurrent;
 }
 
-const sf::Sprite& Enemy::getSprite() const
+sf::Sprite* Enemy::getSprite()
 {
-	return this->sprite;
+	return &this->sprite;
+}
+
+const std::pair<int, int> Enemy::getCoinsToDrop() const
+{
+	return this->coinsToDrop;
 }
 
 //setters
@@ -72,15 +100,18 @@ void Enemy::setPosition(const float x, const float y)
 void Enemy::takeDamage(const float damage_taken)
 {
 	this->hpCurrent -= damage_taken;
-	if (hpCurrent < 0)
+	if (this->hpCurrent < 0)
 	{
-		hpCurrent = 0;
+		this->hpCurrent = 0;
 	}
 }
 
-//public functions
-void Enemy::update()
+void Enemy::resetEnemy()
 {
+	this->hpCurrent = this->hpMax;
+	this->texture = *this->textureMap[rng.generateRandomNum(1, 5)];
+	this->sprite.setTexture(this->texture);
+	this->sprite.setScale(spriteScale.first, spriteScale.second);
 }
 
 void Enemy::render(sf::RenderTarget& target)
