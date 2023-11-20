@@ -20,7 +20,11 @@ int main()
 
 /*to do
 -bosses
-	-timer
+	-boss escape animation
+
+-coins
+	-drop animation
+	-pick up coins?
 
 -levels
 	-everything has more hp

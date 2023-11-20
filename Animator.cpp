@@ -9,32 +9,81 @@ void Animator::initFlags()
 {
 	this->firstFrame = true;
 	this->animationEnd = false;
+	this->timeElapsed = 0.f;
+	this->deathAnimationSpeed = 10.f;
+	this->frameDuration = 0.05f;
 }
 
-void Animator::updateAnimation()
+void Animator::initSmokeTexture()
+{
+	if (!this->smokeTextureSheet.loadFromFile("textures/smoke_sheet.png"))
+	{
+		std::cout << "ERROR::ANIMATOR::INITSMOKETEXTURE::Couldn't load smoke_sheet.png\n";
+	}
+}
+
+void Animator::initSmokeSprite()
+{
+	this->smokeSprite.setTexture(this->smokeTextureSheet);
+	this->currentFrame = sf::IntRect(0, 0, 150, 150);
+	this->smokeSprite.setTextureRect(sf::IntRect(0, 0, 150, 150));
+	this->smokeSprite.setScale(2.f, 2.f);
+}
+
+void Animator::updateDeathAnimation()
 {	
 	if (this->firstFrame)
 	{
-		/*a hack to fix first frame issue where first calculation
-		of dt is too large*/
+		//resets the clock since its been running a while
 		this->firstFrame = false;
-		this->dt = dtClock.restart().asSeconds();
+		this->deltaTime = this->dtClock.restart().asSeconds();
 	}
-	else if(this->sprite->getScale().x > 0.001)
+	else if(this->deathSprite->getScale().x > 0.001)
 	{
-		/*death animation. shrinks the enemy to nothing*/
-		this->speed = 10.f;
+		//death animation. shrinks the enemy to nothing
+		this->deltaTime = this->dtClock.restart().asSeconds();
 
-		this->dt = dtClock.restart().asSeconds();
-		this->currentScale = this->sprite->getScale();
-		this->newScale = currentScale - currentScale * dt * speed;
-
-		this->sprite->setScale(newScale);
+		this->currentScale = this->deathSprite->getScale();
+		this->newScale = this->currentScale - this->currentScale 
+			* this->deltaTime * this->deathAnimationSpeed;
+		this->deathSprite->setScale(this->newScale);
 	}
 	else
 	{
-		this->sprite->setScale(0.f, 0.f);
+		this->deathSprite->setScale(0.f, 0.f);
 		this->animationEnd = true;
+	}
+}
+
+void Animator::updateEscapeAnimation()
+{
+	if (this->firstFrame)
+	{
+		//resets the clock since its been running a while
+		this->firstFrame = false;
+		this->deltaTime = this->dtClock.restart().asSeconds();
+	}
+	else
+	{
+		//plays a puff of smoke when enemy escapes
+		this->deltaTime = this->dtClock.restart().asSeconds();
+		this->timeElapsed += this->deltaTime;
+
+		if(this->timeElapsed >= this->frameDuration)
+		{
+			this->timeElapsed = 0.f;
+			if (this->currentFrame.left < 1050)
+			{
+				this->currentFrame.left += 150;
+				this->smokeSprite.setTextureRect(this->currentFrame);
+			}
+			else
+			{
+				this->animationEnd = true;
+				this->timeElapsed = 0.f;
+
+			}
+		}
 	}
 }
 
@@ -42,6 +91,8 @@ void Animator::updateAnimation()
 Animator::Animator()
 {
 	this->initFlags();
+	this->initSmokeTexture();
+	this->initSmokeSprite();
 }
 
 //deconstructor
@@ -50,9 +101,14 @@ Animator::~Animator()
 }
 
 //getters
-const sf::FloatRect& Animator::getGlobalBounds() const
+const sf::FloatRect& Animator::getDeathSpriteGlobalBounds() const
 {
-		return this->sprite->getGlobalBounds();
+		return this->deathSprite->getGlobalBounds();
+}
+
+const sf::FloatRect& Animator::getSmokeSpriteGlobalBounds() const
+{
+	return this->smokeSprite.getGlobalBounds();
 }
 
 const bool Animator::getAnimationEnd() const
@@ -61,14 +117,19 @@ const bool Animator::getAnimationEnd() const
 }
 
 //setters
-void Animator::setPosition(float x, float y)
+void Animator::setDeathSpritePosition(const float x, const float y)
 {
-	this->sprite->setPosition(x, y);
+	this->deathSprite->setPosition(x, y);
+}
+
+void Animator::setSmokeSpritePosition(const float x, const float y)
+{
+	this->smokeSprite.setPosition(x, y);
 }
 
 void Animator::setSprite(sf::Sprite* sprite)
 {
-	this->sprite = sprite;
+	this->deathSprite = sprite;
 }
 
 //public functions
@@ -78,12 +139,28 @@ void Animator::resetAnimator()
 	this->firstFrame = true;
 }
 
-void Animator::update()
+void Animator::update(std::string update_this)
 {
-	this->updateAnimation();
+	if(update_this == "death")
+	{
+		this->updateDeathAnimation();
+	}
+
+	if(update_this == "escape")
+	{
+		this->updateEscapeAnimation();
+	}
 }
 
-void Animator::render(sf::RenderTarget& target)
+void Animator::render(sf::RenderTarget& target, bool play_death, bool play_escape)
 {
-	target.draw(*this->sprite);
+	if(play_death)
+	{
+		target.draw(*this->deathSprite);
+	}
+
+	if(play_escape)
+	{
+		target.draw(this->smokeSprite);
+	}
 }

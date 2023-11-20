@@ -3,24 +3,35 @@ class Animator
 {
 private:
 	//private variables
-	sf::Sprite* sprite;
+	sf::Sprite* deathSprite;
 
 	sf::Vector2f currentScale;
 	sf::Vector2f targetScale;
 	sf::Vector2f newScale;
 
 	sf::Clock dtClock;
-	float dt;
+	float timeElapsed;
+	float frameDuration;
+	float deltaTime;
 
 	bool firstFrame;
 	bool animationEnd;
-	float speed;
+	float deathAnimationSpeed;
+		
+
+	sf::Texture smokeTextureSheet;
+	sf::Sprite smokeSprite;
+	sf::IntRect currentFrame;
 
 	//private initation functions
 	void initFlags();
+	void initSmokeTexture();
+	void initSmokeSprite();
+
 
 	//private update functions
-	void updateAnimation();
+	void updateDeathAnimation();
+	void updateEscapeAnimation();
 
 public:
 	//constructor
@@ -29,17 +40,19 @@ public:
 	~Animator();
 
 	//getters
-	const sf::FloatRect& getGlobalBounds() const;
+	const sf::FloatRect& getDeathSpriteGlobalBounds() const;
+	const sf::FloatRect& getSmokeSpriteGlobalBounds() const;
 	const bool getAnimationEnd() const;
 
 	//setters
-	void setPosition(float x, float y);
+	void setDeathSpritePosition(const float x, const float y);
+	void setSmokeSpritePosition(const float x, const float y);
 	void setSprite(sf::Sprite* sprite);
 
 	//public functions
 	void resetAnimator();
 
-	void update();
-	void render(sf::RenderTarget& target);
+	void update(std::string update_this); 
+	void render(sf::RenderTarget& target, bool play_death, bool play_escape);
 };
 

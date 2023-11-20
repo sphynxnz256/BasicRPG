@@ -18,8 +18,11 @@ private:
 	Enemy* enemy;
 	Boss* boss;
 	UI* ui;
+
 	Animator* animator;
-	bool playAnimation;
+	bool playDeathAnimation;
+	bool playEscapeAnimation;
+
 	RNG& rng;
 
 	bool mouseHeld;
@@ -54,7 +57,9 @@ private:
 	void renderUI();
 
 	//other private functions
+	void bossEscape();
 	void enemyDeath();
+	void setUpBoss();
 	void bossDeath();
 
 public:

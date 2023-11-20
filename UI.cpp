@@ -47,10 +47,18 @@ void UI::initText()
 	this->upgradeCostText.setOutlineColor(sf::Color::Black);
 	this->upgradeCostText.setOutlineThickness(1.f);
 	this->upgradeCostText.setString("Upgrade Cost: not set");
+
+	//displays timer for boss fight
+	this->countdownText.setFont(font);
+	this->countdownText.setCharacterSize(24);
+	this->countdownText.setOutlineColor(sf::Color::Black);
+	this->countdownText.setOutlineThickness(1.f);
+	this->countdownText.setString("not set");
 }
 
 void UI::initUpgradeButton()
 {
+	//creates an upgrade button for upgrading damage
 	float pos_x = 20.f;
 	float pos_y = this->damageText.getPosition().y + this->damageText.getGlobalBounds().height + 10.f;
 	float width = 100.f;
@@ -64,8 +72,49 @@ void UI::initUpgradeButton()
 		idle_color, hover_color, text, font, character_size);
 
 	//set upgrade cost text position once upgrade button's position is set
-	this->upgradeCostText.setPosition(20.f, this->upgradeButton.getPosition().y + this->upgradeButton.getGlobalBounds().height + 5.f);
+	this->upgradeCostText.setPosition(20.f, 
+		this->upgradeButton.getPosition().y + this->upgradeButton.getGlobalBounds().height + 5.f);
 }
+
+void UI::initCountdown()
+{
+	this->timeLeft = 15.f;
+	this->firstFrame = true;
+}
+
+void UI::updateCountdown()
+{
+	//update the boss timer when fighting a boss
+	if (firstFrame)
+	{
+		/*hack to avoid having a large dt for the first frame*/
+		this->firstFrame = false; 
+		this->dt = dtClock.restart().asSeconds();
+	}
+	else
+	{	
+		//calculate current remaining time
+		this->dt = dtClock.restart().asSeconds();
+		this->timeLeft -= dt;
+
+		//check if time left is negative and set to 0
+		if (this->timeLeft < 0.f)
+		{
+			this->timeLeft = 0.f;
+		}
+
+		//update countdown text
+		std::stringstream ss;
+		ss << std::fixed << std::setprecision(1) << timeLeft;
+		this->countdownText.setString(ss.str());
+		if (this->timeLeft < 3.f)
+		{
+			this->countdownText.setFillColor(sf::Color::Red);
+		}
+	}
+}
+
+
 
 //constructors
 UI::UI()
@@ -74,11 +123,17 @@ UI::UI()
 	this->initFonts();
 	this->initText();
 	this->initUpgradeButton();
+	this->initCountdown();
 }
 
 //deconstructor
 UI::~UI()
 {
+}
+
+const float UI::getTimeLeft()
+{
+	return this->timeLeft;
 }
 
 //setters
@@ -107,6 +162,18 @@ void UI::setHpBarLength(const float current_hp, const float max_hp)
 	this->hpCurrentBar.setSize(sf::Vector2f(this->hpMaxBar.getSize().x * current_hp / max_hp, this->hpMaxBar.getSize().y));
 }
 
+void UI::setHpBarMaxLength(const bool boss_active)
+{
+	if (boss_active)
+	{
+		this->hpMaxBar.setSize(sf::Vector2f(260.f, this->hpMaxBar.getSize().y));
+	}
+	else
+	{
+		this->hpMaxBar.setSize(sf::Vector2f(130.f, this->hpMaxBar.getSize().y));
+	}
+}
+
 void UI::setCoinsText(const int coins)
 {
 	std::stringstream ss;
@@ -124,19 +191,41 @@ void UI::setDamageText(const float damage)
 void UI::setUpgradeCostText(const int upgrade_cost)
 {
 	std::stringstream ss;
-	ss << "Upgrade Cost: " << upgrade_cost << " coins\n";
+	ss << "Upgrade damage cost: " << upgrade_cost << " Coins\n";
 	this->upgradeCostText.setString(ss.str());
 }
 
+void UI::setCountdownPosition(const float x_pos)
+{
+	this->countdownText.setPosition(x_pos / 2 - this->countdownText.getGlobalBounds().width / 2,
+		this->hpMaxBar.getGlobalBounds().top - 40.f);
+}
+
+//public functions
 bool UI::upgradeButtonCLicked(sf::Vector2f mouse_pos)
 {
 	return upgradeButton.isClicked(mouse_pos);
 }
 
-//public functions
-void UI::render(sf::RenderTarget& target, float current_hp, const sf::Vector2f& mouse_pos)
+void UI::resetTimer()
 {
-	if(current_hp > 0)
+	this->timeLeft = 15.f;
+	this->firstFrame = true;
+	this->countdownText.setFillColor(sf::Color::White);
+}
+
+void UI::update(const bool boss_active)
+{
+	if(boss_active)	{
+		
+		this->updateCountdown();
+	}
+}
+
+void UI::render(sf::RenderTarget& target, float current_hp,
+	const sf::Vector2f& mouse_pos, bool boss_active, bool boss_escape)
+{
+	if(current_hp > 0.f && !boss_escape)
 	{
 		target.draw(this->hpMaxBar);
 		target.draw(this->hpCurrentBar);
@@ -151,4 +240,8 @@ void UI::render(sf::RenderTarget& target, float current_hp, const sf::Vector2f& 
 		target.draw(this->upgradeCostText);
 	}
 	
+	if (boss_active && !boss_escape)
+	{
+		target.draw(this->countdownText);
+	}	
 }

@@ -7,6 +7,7 @@
 #include <memory>
 #include <utility>
 #include <sstream>
+#include <iomanip>
 
 //sfml
 #include <SFML/Graphics.hpp>

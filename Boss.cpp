@@ -4,9 +4,9 @@
 //private functions
 void Boss::initVariables()
 {
-	this->hpMax = 100;
+	this->hpMax = 250;
 	this->hpCurrent = this->hpMax;
-	this->coinsToDrop = std::make_pair(5, 10);
+	this->coinsToDrop = std::make_pair(10, 20);
 	this->spriteScale = std::make_pair(0.5f, 0.5f);
 }
 
