@@ -114,6 +114,15 @@ void Enemy::resetEnemy()
 	this->sprite.setScale(spriteScale.first, spriteScale.second);
 }
 
+bool Enemy::isDead()
+{
+	if (this->getHpCurrent() <= 0.f)
+	{
+		return true;
+	}
+	return false;
+}
+
 void Enemy::render(sf::RenderTarget& target)
 {
 	target.draw(this->sprite);

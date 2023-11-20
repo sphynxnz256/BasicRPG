@@ -57,10 +57,14 @@ private:
 	void renderUI();
 
 	//other private functions
+	void bossTakeDamage();
+	void enemyTakeDamage();
 	void bossEscape();
 	void enemyDeath();
 	void setUpBoss();
 	void bossDeath();
+	void upgradeDamage();
+	void retreat();
 
 public:
 	//constructor

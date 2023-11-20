@@ -44,6 +44,7 @@ public:
 	
 	//public functions
 	void resetEnemy();
+	bool isDead();
 
 	void render(sf::RenderTarget& target);
 };

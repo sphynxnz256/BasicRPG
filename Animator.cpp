@@ -87,6 +87,22 @@ void Animator::updateEscapeAnimation()
 	}
 }
 
+void Animator::renderDeathAnimation(sf::RenderTarget& target, bool play_death)
+{
+	if (play_death)
+	{
+		target.draw(*this->deathSprite);
+	}
+}
+
+void Animator::renderEscapeAnimation(sf::RenderTarget& target, bool play_escape)
+{
+	if (play_escape)
+	{
+		target.draw(this->smokeSprite);
+	}
+}
+
 //constructor
 Animator::Animator()
 {
@@ -154,13 +170,6 @@ void Animator::update(std::string update_this)
 
 void Animator::render(sf::RenderTarget& target, bool play_death, bool play_escape)
 {
-	if(play_death)
-	{
-		target.draw(*this->deathSprite);
-	}
-
-	if(play_escape)
-	{
-		target.draw(this->smokeSprite);
-	}
+	this->renderDeathAnimation(target, play_death);
+	this->renderEscapeAnimation(target, play_escape);
 }

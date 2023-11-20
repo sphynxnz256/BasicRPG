@@ -6,7 +6,7 @@
 //private functions
 void Player::initVariables()
 {
-	this->damage = 1.f;
+	this->damage = 10.f;
 	this->attackCDMax = 10.f;
 	this->attackCD = attackCDMax;
 	this->coins = 0;
@@ -40,6 +40,7 @@ const int Player::getUpgradeCost() const
 	return this->upgradeCost;
 }
 
+//public functions
 void Player::upgradeDamage()
 {
 	this->damage *= 2.f;
@@ -52,7 +53,6 @@ void Player::addCoins(int coins_to_add)
 	this->coins += coins_to_add;
 }
 
-//public functions
 bool Player::canUpgrade()
 {
 	if (this->coins >= this->upgradeCost)

@@ -38,6 +38,14 @@ public:
 
 	//public functions
 	void resetBoss();
+	bool isDead()
+	{
+		if (this->hpCurrent <= 0.f)
+		{
+			return true;
+		}
+		return false;
+	}
 
 	void render(sf::RenderTarget& target);
 };

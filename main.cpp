@@ -20,7 +20,7 @@ int main()
 
 /*to do
 -bosses
-	-boss escape animation
+	-retreat button
 
 -coins
 	-drop animation

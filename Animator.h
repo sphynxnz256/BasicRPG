@@ -33,6 +33,10 @@ private:
 	void updateDeathAnimation();
 	void updateEscapeAnimation();
 
+	//private render functions
+	void renderDeathAnimation(sf::RenderTarget& target, bool play_death);
+	void renderEscapeAnimation(sf::RenderTarget& target, bool play_escape);
+
 public:
 	//constructor
 	Animator();
