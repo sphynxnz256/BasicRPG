@@ -142,9 +142,9 @@ void UI::updateCountdown(float target_x, float boss_top)
 	}
 }
 
-void UI::renderHpBar(sf::RenderTarget& target, float current_hp, bool boss_escape)
+void UI::renderHpBar(sf::RenderTarget& target, bool escape_animation, bool death_animation)
 {
-	if (current_hp > 0.f && !boss_escape) 
+	if (!escape_animation && !death_animation)
 	{
 		target.draw(this->hpMaxBar); 
 		target.draw(this->hpCurrentBar); 
@@ -167,17 +167,17 @@ void UI::renderUpradeButton(sf::RenderTarget& target, const sf::Vector2f& mouse_
 }
 
 void UI::renderEscapeButton(sf::RenderTarget& target, const sf::Vector2f& mouse_pos,
-	bool boss_active, bool boss_escape)
+	bool boss_active, bool escape_animation, bool death_animation)
 {
-	if (boss_active && !boss_escape)
+	if (boss_active && !escape_animation && !death_animation)
 	{
 		this->retreatButton.draw(target, mouse_pos);
 	}
 }
 
-void UI::renderCountdown(sf::RenderTarget& target, bool boss_active, bool boss_escape)
+void UI::renderCountdown(sf::RenderTarget& target, bool boss_active, bool escape_animation, bool death_animation)
 {
-	if (boss_active && !boss_escape) 
+	if (boss_active && !escape_animation && !death_animation)
 	{
 		target.draw(this->countdownText); 
 	}
@@ -295,12 +295,12 @@ void UI::update(const bool boss_active, float target_x, float boss_top)
 	}
 }
 
-void UI::render(sf::RenderTarget& target, float current_hp,
-	const sf::Vector2f& mouse_pos, bool boss_active, bool boss_escape)
+void UI::render(sf::RenderTarget& target, const sf::Vector2f& mouse_pos,
+	bool boss_active, bool escape_animation, bool death_animation)
 {
-	this->renderHpBar(target, current_hp, boss_escape);
+	this->renderHpBar(target, escape_animation, death_animation);
 	this->renderPlayerStats(target);
 	this->renderUpradeButton(target, mouse_pos);
-	this->renderEscapeButton(target, mouse_pos, boss_active, boss_escape);
-	this->renderCountdown(target, boss_active, boss_escape);
+	this->renderEscapeButton(target, mouse_pos, boss_active, escape_animation, death_animation);
+	this->renderCountdown(target, boss_active, escape_animation, death_animation);
 }

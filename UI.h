@@ -36,12 +36,12 @@ private:
 	void updateCountdown(float target_x, float boss_top);
 
 	//private render functions
-	void renderHpBar(sf::RenderTarget& target, float current_hp, bool boss_escape);
+	void renderHpBar(sf::RenderTarget& target, bool escape_animation, bool death_animation);
 	void renderPlayerStats(sf::RenderTarget& target);
 	void renderUpradeButton(sf::RenderTarget& target, const sf::Vector2f& mouse_pos);
 	void renderEscapeButton(sf::RenderTarget& target, const sf::Vector2f& mouse_pos,
-		bool boss_active, bool boss_escape);
-	void renderCountdown(sf::RenderTarget& target, bool boss_active, bool boss_escape);
+		bool boss_active, bool boss_escape, bool death_animation);
+	void renderCountdown(sf::RenderTarget& target, bool boss_active, bool escape_animation, bool death_animation);
 
 public:
 	//constructor
@@ -67,7 +67,7 @@ public:
 	bool retreatButtonCLicked(sf::Vector2f& mouse_pos);
 	void resetTimer();
 	void update(const bool boss_active, float target_x, float boss_top);
-	void render(sf::RenderTarget& target, float current_hp,
-		const sf::Vector2f& mouse_pos, bool boss_active, bool boss_escape);
+	void render(sf::RenderTarget& target, const sf::Vector2f& mouse_pos,
+		bool boss_active, bool boss_escape, bool death_animation);
 };
 

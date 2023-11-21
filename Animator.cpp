@@ -81,6 +81,7 @@ void Animator::updateEscapeAnimation()
 			{
 				this->animationEnd = true;
 				this->timeElapsed = 0.f;
+				this->currentFrame = sf::IntRect(0, 0, 150, 150); 
 
 			}
 		}

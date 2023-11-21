@@ -60,7 +60,7 @@ void Game::initBackground()
 void Game::initUI()
 {
 	//create an hp bar and set its position above the enemy
-	this->ui = new UI(this->window.getSize().x, this->enemy->getGlobalBounds().top,
+	this->ui = new UI(static_cast<float>(this->window.getSize().x), this->enemy->getGlobalBounds().top,
 		this->player->getCoins(), this->player->getDamage(), this->player->getUpgradeCost(),
 		this->boss->getGlobalBounds().top);
 }
@@ -80,50 +80,71 @@ void Game::polledEvents()
 //private update functions
 void Game::updateCombat()
 {
-	//if fighting boss, check to see if boss escapes
-	if (this->bossActive && this->ui->getTimeLeft() <= 0.f)
+	//check no animations are playing
+	if(!this->playDeathAnimation && !this->playEscapeAnimation)
 	{
-		this->bossEscape();
-	}
-
-	/*this checks to see if the player is attacking and determines how much damage the enemy takes. it then
-	also updates the hp bar in the ui*/
-	if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
-	{
-		if (!this->mouseHeld)
+		//if fighting boss, check to see if boss escapes
+		if (this->bossActive && this->ui->getTimeLeft() <= 0.f)
 		{
-			this->mousePosition = sf::Vector2f(static_cast<float>(sf::Mouse::getPosition(this->window).x),
-				static_cast<float>(sf::Mouse::getPosition(this->window).y));
-
-			if (this->bossActive && this->boss->getGlobalBounds().contains(this->mousePosition))
+			this->playEscapeAnimation = true;
+			this->bossEscape();			
+		}
+		/*this checks to see if the player is attacking and determines how much damage the enemy takes. it then
+		also updates the hp bar in the ui*/
+		else if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
+		{
+			if (!this->mouseHeld)
 			{
-				this->mouseHeld = true;
-				this->bossTakeDamage();
+				this->mousePosition = sf::Vector2f(static_cast<float>(sf::Mouse::getPosition(this->window).x),
+					static_cast<float>(sf::Mouse::getPosition(this->window).y));
+
+				if (this->bossActive && this->boss->getGlobalBounds().contains(this->mousePosition))
+				{
+					this->mouseHeld = true;
+					this->bossTakeDamage();
+				}
+				//if fighting a regular enemy
+				else if (this->enemy->getGlobalBounds().contains(this->mousePosition))
+				{
+					this->mouseHeld = true;
+					this->enemyTakeDamage();
+				}
 			}
-			//if fighting a regular enemy
-		    else if (this->enemy->getGlobalBounds().contains(this->mousePosition))
-			{				
-				this->mouseHeld = true;
-				this->enemyTakeDamage();				
-			}
+		}
+		else
+		{
+			this->mouseHeld = false;
+		}
+
+		//if fighting boss and its dead, play death animation
+		if (this->bossActive && this->boss->isDead())
+		{
+			this->animator->setSprite(this->boss->getSprite());
+			this->playDeathAnimation = true;
+			this->bossDeath();
+		}
+		//if fighting regular enemy and its dead, play death animation
+		else if (this->enemy->isDead())
+		{
+			this->animator->setSprite(this->enemy->getSprite());
+			this->playDeathAnimation = true;
+			this->enemyDeath();
+		}
+	}
+	else if (this->playDeathAnimation)
+	{
+		if(this->bossActive)
+		{
+			this->bossDeath();
+		}
+		else
+		{
+			this->enemyDeath();
 		}
 	}
 	else
 	{
-		this->mouseHeld = false;
-	}
-
-	//if fighting boss and its dead, play death animation
-	if (this->bossActive && this->boss->isDead())
-	{
-		this->animator->setSprite(this->boss->getSprite());
-		this->bossDeath();
-	}
-	//if fighting regular enemy and its dead, play death animation
-	else if (this->enemy->isDead())		
-	{
-		this->animator->setSprite(this->enemy->getSprite());
-		this->enemyDeath();
+		this->bossEscape();
 	}
 }
 
@@ -144,7 +165,7 @@ void Game::enemyTakeDamage()
 
 void Game::bossEscape()
 {
-	this->playEscapeAnimation = true;
+	//check if animation is finished
 	if (this->animator->getAnimationEnd())
 	{
 		//reset timer
@@ -162,15 +183,14 @@ void Game::bossEscape()
 		this->ui->setHpBarMaxLength(this->bossActive); 
 		this->ui->setHpBarLength(this->enemy->getHpCurrent(), this->enemy->getHpMax()); 
 		this->ui->setHpBarColor(this->enemy->getHpCurrent(), this->enemy->getHpMax()); 
-		this->ui->setHpBarPosition(this->window.getSize().x, this->enemy->getGlobalBounds().top); 
+		this->ui->setHpBarPosition(static_cast<float>(this->window.getSize().x), this->enemy->getGlobalBounds().top);
 
 	}
 }
 
 void Game::enemyDeath()
 {
-	//plays an animation for enemy death
-	this->playDeathAnimation = true;
+	//check if animation is finished
 	if (this->animator->getAnimationEnd())
 	{
 		//update kill count
@@ -211,14 +231,13 @@ void Game::setUpBoss()
 
 	//set hp bars for boss
 	this->ui->setHpBarMaxLength(this->bossActive);
-	this->ui->setHpBarPosition(this->window.getSize().x, this->boss->getGlobalBounds().top);
+	this->ui->setHpBarPosition(static_cast<float>(this->window.getSize().x), this->boss->getGlobalBounds().top);
 	this->ui->setHpBarLength(this->enemy->getHpCurrent(), this->enemy->getHpMax()); 
 }
 
 void Game::bossDeath()
 {
-	//plays an animation for boss death
-	this->playDeathAnimation = true;
+	//check if animation is finished
 	if (this->animator->getAnimationEnd())
 	{
 		//reset timer
@@ -239,7 +258,7 @@ void Game::bossDeath()
 		this->ui->setHpBarMaxLength(this->bossActive);
 		this->ui->setHpBarLength(this->boss->getHpCurrent(), this->boss->getHpMax());
 		this->ui->setHpBarColor(this->boss->getHpCurrent(), this->boss->getHpMax());
-		this->ui->setHpBarPosition(this->window.getSize().x, this->enemy->getGlobalBounds().top);
+		this->ui->setHpBarPosition(static_cast<float>(this->window.getSize().x), this->enemy->getGlobalBounds().top);
 
 		//player gets loot
 		this->player->addCoins(rng.generateRandomNum(this->boss->getCoinsToDrop().first, this->boss->getCoinsToDrop().second));
@@ -264,7 +283,7 @@ void Game::updateUI()
 		this->retreat();
 	}
 
-	this->ui->update(this->bossActive, this->window.getSize().x, this->boss->getGlobalBounds().top);
+	this->ui->update(this->bossActive, static_cast<float>(this->window.getSize().x), this->boss->getGlobalBounds().top);
 }
 
 void Game::upgradeDamage()
@@ -291,6 +310,7 @@ void Game::retreat()
 	if (!this->mouseHeld)
 	{
 		this->mouseHeld = true;
+		this->playEscapeAnimation = true;
 		this->bossEscape();
 		//running boss escape animation but not spawning new enemy
 	}
@@ -347,8 +367,8 @@ void Game::renderUI()
 {
 	this->mousePosition = sf::Vector2f(static_cast<float>(sf::Mouse::getPosition(this->window).x),
 		static_cast<float>(sf::Mouse::getPosition(this->window).y));
-	this->ui->render(this->window, this->enemy->getHpCurrent(), this->mousePosition, this->bossActive, 
-		this->playEscapeAnimation);
+	this->ui->render(this->window, this->mousePosition, this->bossActive, this->playEscapeAnimation, 
+		this->playDeathAnimation);
 }
 
 //constructor

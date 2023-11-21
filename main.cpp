@@ -19,8 +19,6 @@ int main()
 }
 
 /*to do
--bosses
-	-retreat button
 
 -coins
 	-drop animation
