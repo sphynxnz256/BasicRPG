@@ -22,7 +22,7 @@ void Enemy::initTextures()
 	this->textureAddressMap[5] = "textures/enemies/wasp.png";
 
 	//preload textures and store them in a map
-	for (const auto& pair : textureAddressMap)
+	for (const auto& pair : this->textureAddressMap)
 	{
 		int unique_number = pair.first;
 		const std::string& texture_address = pair.second;
@@ -38,13 +38,13 @@ void Enemy::initTextures()
 		}
 	}
 
-	this->texture = *this->textureMap[rng.generateRandomNum(1, 5)];
+	this->texture = *this->textureMap[this->rng.generateRandomNum(1, 5)];
 }
 
 void Enemy::initSprite()
 {
 	this->sprite.setTexture(this->texture);
-	this->sprite.setScale(spriteScale.first, spriteScale.second);
+	this->sprite.setScale(this->spriteScale.first, this->spriteScale.second);
 }
 
 //constructor

@@ -19,7 +19,6 @@ int main()
 }
 
 /*to do
-
 -coins
 	-drop animation
 	-pick up coins?
@@ -29,10 +28,13 @@ int main()
 	-new enemies
 	-more loots
 
--saving games
-
 -menu screen
 	-load game
 	-new game
+	-options
 	-exit etc
+
+-saving games
+
+
 */

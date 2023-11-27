@@ -6,6 +6,7 @@
 #include "UI.h"
 #include "Animator.h"
 #include "RNG.h"
+#include "Coin.h"
 
 class Game
 {
@@ -33,6 +34,9 @@ private:
 
 	int killCounter;
 	bool bossActive;
+	int coinsToDrop;
+	std::vector<Coin> coinsVector;
+	std::shared_ptr<sf::Texture> sharedCoinTexture;
 
 	//private initiation functions
 	void initWindow();
@@ -41,6 +45,7 @@ private:
 	void initBoss();
 	void initAnimator();
 	void initBackground();
+	void initSharedCoinTexture();
 	void initUI();
 
 	//private update functions
@@ -48,12 +53,14 @@ private:
 	void updateCombat();
 	void updateUI();
 	void updateAnimator();
+	void updateCoins();
 
 	//private rendering functions
 	void renderEnemy();
 	void renderBoss();
 	void renderAnimator();
 	void renderBackground();
+	void renderCoins();
 	void renderUI();
 
 	//other private functions
@@ -61,6 +68,7 @@ private:
 	void enemyTakeDamage();
 	void bossEscape();
 	void enemyDeath();
+	void dropCoins(std::pair<int, int> coinsToDrop);
 	void setUpBoss();
 	void bossDeath();
 	void upgradeDamage();

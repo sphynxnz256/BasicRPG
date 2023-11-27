@@ -159,7 +159,7 @@ void UI::renderPlayerStats(sf::RenderTarget& target)
 
 void UI::renderUpradeButton(sf::RenderTarget& target, const sf::Vector2f& mouse_pos)
 {
-	this->upgradeButton.draw(target, mouse_pos); 
+	this->upgradeButton.render(target, mouse_pos); 
 	if (this->upgradeButton.isMouseOver(mouse_pos)) 
 	{
 		target.draw(this->upgradeCostText); 
@@ -171,7 +171,7 @@ void UI::renderEscapeButton(sf::RenderTarget& target, const sf::Vector2f& mouse_
 {
 	if (boss_active && !escape_animation && !death_animation)
 	{
-		this->retreatButton.draw(target, mouse_pos);
+		this->retreatButton.render(target, mouse_pos);
 	}
 }
 

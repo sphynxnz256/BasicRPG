@@ -8,6 +8,8 @@
 #include <utility>
 #include <sstream>
 #include <iomanip>
+#include <vector>
+#include <cassert>
 
 //sfml
 #include <SFML/Graphics.hpp>

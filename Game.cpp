@@ -57,6 +57,15 @@ void Game::initBackground()
 	this->background.setTexture(backgroundTexture);
 }
 
+void Game::initSharedCoinTexture()
+{
+	this->sharedCoinTexture = std::make_shared<sf::Texture>();
+	if (!this->sharedCoinTexture->loadFromFile("textures/coin.png"))
+	{
+		std::cout << "ERROR::COIN::INITTEXTURE::Failed to load coin.png\n";
+	}
+}
+
 void Game::initUI()
 {
 	//create an hp bar and set its position above the enemy
@@ -184,7 +193,6 @@ void Game::bossEscape()
 		this->ui->setHpBarLength(this->enemy->getHpCurrent(), this->enemy->getHpMax()); 
 		this->ui->setHpBarColor(this->enemy->getHpCurrent(), this->enemy->getHpMax()); 
 		this->ui->setHpBarPosition(static_cast<float>(this->window.getSize().x), this->enemy->getGlobalBounds().top);
-
 	}
 }
 
@@ -211,9 +219,12 @@ void Game::enemyDeath()
 		this->ui->setHpBarLength(this->enemy->getHpCurrent(), this->enemy->getHpMax()); 
 		this->ui->setHpBarColor(this->enemy->getHpCurrent(), this->enemy->getHpMax());
 
-		//player gets loot
-		this->player->addCoins(rng.generateRandomNum(this->enemy->getCoinsToDrop().first, this->enemy->getCoinsToDrop().second));
-		this->ui->setCoinsText(this->player->getCoins());
+		//coins drop
+		this->dropCoins(this->enemy->getCoinsToDrop());
+
+		////player gets loot
+		//this->player->addCoins(rng.generateRandomNum(this->enemy->getCoinsToDrop().first, this->enemy->getCoinsToDrop().second));
+		//this->ui->setCoinsText(this->player->getCoins());
 
 		//check if enough enemies are killed for boss to spawn
 		if (this->killCounter >= 10)
@@ -222,6 +233,15 @@ void Game::enemyDeath()
 			this->killCounter = 0;
 		}
 	}		
+}
+
+void Game::dropCoins(std::pair<int, int> coins_to_drop)
+{
+	this->coinsToDrop = rng.generateRandomNum(coins_to_drop.first, coins_to_drop.second);
+	for (size_t i = 0; i < this->coinsToDrop; i++)
+	{
+		this->coinsVector.push_back(Coin(this->rng, this->window.getSize(), sharedCoinTexture));
+	}	
 }
 
 void Game::setUpBoss()
@@ -260,10 +280,12 @@ void Game::bossDeath()
 		this->ui->setHpBarColor(this->boss->getHpCurrent(), this->boss->getHpMax());
 		this->ui->setHpBarPosition(static_cast<float>(this->window.getSize().x), this->enemy->getGlobalBounds().top);
 
-		//player gets loot
-		this->player->addCoins(rng.generateRandomNum(this->boss->getCoinsToDrop().first, this->boss->getCoinsToDrop().second));
-		this->ui->setCoinsText(this->player->getCoins());
-		
+		//coins drop
+		this->dropCoins(this->boss->getCoinsToDrop());
+
+		////player gets loot
+		//this->player->addCoins(rng.generateRandomNum(this->boss->getCoinsToDrop().first, this->boss->getCoinsToDrop().second));
+		//this->ui->setCoinsText(this->player->getCoins());		
 	}
 }
 
@@ -312,7 +334,6 @@ void Game::retreat()
 		this->mouseHeld = true;
 		this->playEscapeAnimation = true;
 		this->bossEscape();
-		//running boss escape animation but not spawning new enemy
 	}
 	else
 	{
@@ -333,6 +354,28 @@ void Game::updateAnimator()
 	if (this->playEscapeAnimation)
 	{
 		this->animator->update("escape");
+	}
+}
+
+void Game::updateCoins()
+{
+	bool mouse_held = false;
+	for (auto i = coinsVector.begin(); i != coinsVector.end(); )
+	{
+		this->mousePosition = sf::Vector2f(static_cast<float>(sf::Mouse::getPosition(this->window).x),
+			static_cast<float>(sf::Mouse::getPosition(this->window).y));
+		if (i->isClicked(this->mousePosition) && !this->mouseHeld)
+		{
+			mouse_held = true;
+			this->player->addCoins(i->getCoinValue());
+			this->ui->setCoinsText(this->player->getCoins());
+			//i = coinsVector.erase(i);
+		}
+		else
+		{
+			++i;
+			mouse_held = false;
+		}
 	}
 }
 
@@ -363,6 +406,14 @@ void Game::renderBackground()
 	this->window.draw(this->background);
 }
 
+void Game::renderCoins()
+{
+	for (auto coin : this->coinsVector)
+	{
+		coin.render(this->window);
+	}
+}
+
 void Game::renderUI()
 {
 	this->mousePosition = sf::Vector2f(static_cast<float>(sf::Mouse::getPosition(this->window).x),
@@ -380,6 +431,7 @@ Game::Game(RNG& rng) : rng(rng)
 	this->initBoss();
 	this->initPlayer();
 	this->initAnimator();
+	this->initSharedCoinTexture();
 	this->initUI();
 }
 
@@ -404,6 +456,7 @@ void Game::update()
 	this->polledEvents();
 	this->updateCombat();
 	this->updateAnimator();
+	this->updateCoins();
 	this->updateUI();
 }
 
@@ -415,7 +468,8 @@ void Game::render()
 	this->renderBackground();
 	this->renderEnemy();
 	this->renderBoss();
-	this->renderAnimator();	
+	this->renderAnimator();
+	this->renderCoins();
 
 	//draw ui
 	this->renderUI();
