@@ -12,20 +12,18 @@ private:
 	int coinValue;
 
 	//private functions
-	void initVariables();
 	void initSprite(const sf::Vector2u& target_size, std::shared_ptr<sf::Texture> shared_texture);
 
 public:
+	//constructor
 	Coin(RNG& rng, const sf::Vector2u& target_size, std::shared_ptr<sf::Texture> shared_texture);
 
 	//getters
-	sf::FloatRect getGlobalBounds();
-	sf::Vector2f getPosition();
 	int getCoinValue();
+	sf::Vector2f getPosition();
 
 	//public functions
 	bool isMouseOver(const sf::Vector2f& mouse_pos);
-	bool isClicked(const sf::Vector2f& mouse_pos);
 
 	void render(sf::RenderTarget& target);
 };

@@ -23,6 +23,7 @@ private:
 	Animator* animator;
 	bool playDeathAnimation;
 	bool playEscapeAnimation;
+	bool playCoinAnimation;
 
 	RNG& rng;
 
@@ -37,6 +38,8 @@ private:
 	int coinsToDrop;
 	std::vector<Coin> coinsVector;
 	std::shared_ptr<sf::Texture> sharedCoinTexture;
+	sf::Vector2f coinStart;
+	sf::Vector2f coinEnd;
 
 	//private initiation functions
 	void initWindow();
@@ -45,7 +48,7 @@ private:
 	void initBoss();
 	void initAnimator();
 	void initBackground();
-	void initSharedCoinTexture();
+	void initCoins();
 	void initUI();
 
 	//private update functions
@@ -68,7 +71,7 @@ private:
 	void enemyTakeDamage();
 	void bossEscape();
 	void enemyDeath();
-	void dropCoins(std::pair<int, int> coinsToDrop);
+	void dropCoins(std::pair<int, int> coins_to_drop, sf::Vector2f coin_start);
 	void setUpBoss();
 	void bossDeath();
 	void upgradeDamage();

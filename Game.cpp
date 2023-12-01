@@ -38,8 +38,7 @@ void Game::initBoss()
 
 void Game::initAnimator()
 { 
-	//plays the enemy death animation when its hp reaches 0
-	this->animator = new Animator();
+	this->animator = new Animator(*this->sharedCoinTexture);
 	this->playDeathAnimation = false;
 	this->playEscapeAnimation = false;
 	this->animator->setSmokeSpritePosition(
@@ -57,7 +56,7 @@ void Game::initBackground()
 	this->background.setTexture(backgroundTexture);
 }
 
-void Game::initSharedCoinTexture()
+void Game::initCoins()
 {
 	this->sharedCoinTexture = std::make_shared<sf::Texture>();
 	if (!this->sharedCoinTexture->loadFromFile("textures/coin.png"))
@@ -203,7 +202,6 @@ void Game::enemyDeath()
 	{
 		//update kill count
 		this->killCounter++;
-		std::cout << "kill count: " << killCounter << '\n';
 
 		//reset the animator
 		this->playDeathAnimation = false;
@@ -220,11 +218,10 @@ void Game::enemyDeath()
 		this->ui->setHpBarColor(this->enemy->getHpCurrent(), this->enemy->getHpMax());
 
 		//coins drop
-		this->dropCoins(this->enemy->getCoinsToDrop());
-
-		////player gets loot
-		//this->player->addCoins(rng.generateRandomNum(this->enemy->getCoinsToDrop().first, this->enemy->getCoinsToDrop().second));
-		//this->ui->setCoinsText(this->player->getCoins());
+		/*this->dropCoins(this->enemy->getCoinsToDrop(), sf::Vector2f(
+			this->enemy->getPosition().x + this->enemy->getGlobalBounds().width / 2,
+			this->enemy->getPosition().y + this->enemy->getGlobalBounds().height / 2));*/
+		this->dropCoins(this->enemy->getCoinsToDrop(), this->enemy->getPosition());
 
 		//check if enough enemies are killed for boss to spawn
 		if (this->killCounter >= 10)
@@ -235,12 +232,15 @@ void Game::enemyDeath()
 	}		
 }
 
-void Game::dropCoins(std::pair<int, int> coins_to_drop)
+void Game::dropCoins(std::pair<int, int> coins_to_drop, sf::Vector2f coin_start)
 {
 	this->coinsToDrop = rng.generateRandomNum(coins_to_drop.first, coins_to_drop.second);
+	this->playCoinAnimation = true;
 	for (size_t i = 0; i < this->coinsToDrop; i++)
 	{
-		this->coinsVector.push_back(Coin(this->rng, this->window.getSize(), sharedCoinTexture));
+		Coin temp_coin(this->rng, this->window.getSize(), this->sharedCoinTexture);
+		this->animator->startCoinAnimation(coin_start, temp_coin.getPosition());
+		this->coinsVector.push_back(Coin(temp_coin));
 	}	
 }
 
@@ -281,11 +281,9 @@ void Game::bossDeath()
 		this->ui->setHpBarPosition(static_cast<float>(this->window.getSize().x), this->enemy->getGlobalBounds().top);
 
 		//coins drop
-		this->dropCoins(this->boss->getCoinsToDrop());
-
-		////player gets loot
-		//this->player->addCoins(rng.generateRandomNum(this->boss->getCoinsToDrop().first, this->boss->getCoinsToDrop().second));
-		//this->ui->setCoinsText(this->player->getCoins());		
+		this->dropCoins(this->boss->getCoinsToDrop(), sf::Vector2f(
+			this->boss->getPosition().x + this->boss->getGlobalBounds().width / 2,
+			this->boss->getPosition().y + this->boss->getGlobalBounds().height / 2));
 	}
 }
 
@@ -355,27 +353,43 @@ void Game::updateAnimator()
 	{
 		this->animator->update("escape");
 	}
+
+	if (!this->playDeathAnimation && this->playCoinAnimation)
+	{
+		this->animator->update("coin");
+	}
 }
 
 void Game::updateCoins()
 {
-	bool mouse_held = false;
-	for (auto i = coinsVector.begin(); i != coinsVector.end(); )
+
+	static bool click_processed = false;
+	if(sf::Mouse::isButtonPressed(sf::Mouse::Left)) 
 	{
-		this->mousePosition = sf::Vector2f(static_cast<float>(sf::Mouse::getPosition(this->window).x),
-			static_cast<float>(sf::Mouse::getPosition(this->window).y));
-		if (i->isClicked(this->mousePosition) && !this->mouseHeld)
+		if (!click_processed)
 		{
-			mouse_held = true;
-			this->player->addCoins(i->getCoinValue());
-			this->ui->setCoinsText(this->player->getCoins());
-			//i = coinsVector.erase(i);
-		}
-		else
-		{
-			++i;
-			mouse_held = false;
-		}
+			this->mousePosition = sf::Vector2f(static_cast<float>(sf::Mouse::getPosition(this->window).x),
+				static_cast<float>(sf::Mouse::getPosition(this->window).y));
+				std::vector<Coin> coinsToKeep;
+			for (auto& coin : this->coinsVector)
+			{	
+				if (coin.isMouseOver(this->mousePosition))
+				{	
+					this->player->addCoins(coin.getCoinValue());
+					this->ui->setCoinsText(this->player->getCoins());					
+				}
+				else
+				{
+					coinsToKeep.push_back(coin);
+				}
+			}
+			this->coinsVector.swap(coinsToKeep);
+			click_processed = true;
+		}		 
+	}
+	else
+	{
+		click_processed = false; 
 	}
 }
 
@@ -398,7 +412,8 @@ void Game::renderBoss()
 
 void Game::renderAnimator()
 {
-	this->animator->render(this->window, this->playDeathAnimation, this->playEscapeAnimation);
+	this->animator->render(this->window, this->playDeathAnimation, this->playEscapeAnimation,
+		this->playCoinAnimation);
 }
 
 void Game::renderBackground()
@@ -430,8 +445,8 @@ Game::Game(RNG& rng) : rng(rng)
 	this->initEnemy();
 	this->initBoss();
 	this->initPlayer();
+	this->initCoins();
 	this->initAnimator();
-	this->initSharedCoinTexture();
 	this->initUI();
 }
 

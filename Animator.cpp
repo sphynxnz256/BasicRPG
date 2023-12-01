@@ -5,10 +5,11 @@
 /*the animator class plays animations*/
 
 //private initation functions
-void Animator::initFlags()
+void Animator::initVariables()
 {
 	this->firstFrame = true;
 	this->animationEnd = false;
+	this->coinAnimationEnded = true;
 	this->timeElapsed = 0.f;
 	this->deathAnimationSpeed = 10.f;
 	this->frameDuration = 0.05f;
@@ -28,6 +29,17 @@ void Animator::initSmokeSprite()
 	this->currentFrame = sf::IntRect(0, 0, 150, 150);
 	this->smokeSprite.setTextureRect(sf::IntRect(0, 0, 150, 150));
 	this->smokeSprite.setScale(2.f, 2.f);
+}
+
+void Animator::initCoinAnimation(sf::Texture& coin_texture)
+{
+	this->coinSprite.setTexture(coin_texture);
+	this->coinSprite.setScale(0.1f, 0.1f);
+	this->coinStart = sf::Vector2f(0.f, 0.f);
+	this->coinEnd = sf::Vector2f(0.f, 0.f);
+	this->coinControlPoint = sf::Vector2f(300.f, 50.f);
+	this->coinAnimationSpeed = 400.f;
+	this->coinDistance = 0.f;
 }
 
 void Animator::updateDeathAnimation()
@@ -81,9 +93,56 @@ void Animator::updateEscapeAnimation()
 			{
 				this->animationEnd = true;
 				this->timeElapsed = 0.f;
-				this->currentFrame = sf::IntRect(0, 0, 150, 150); 
+				this->currentFrame = sf::IntRect(0, 0, 150, 150);
 
 			}
+		}
+	}
+}
+
+void Animator::updateCoinAnimation()
+{
+	if (!this->coinAnimationEnded)
+	{
+		if (this->firstFrame)
+		{
+			this->deltaTime = this->dtClock.restart().asSeconds();
+			this->firstFrame = false;
+		}
+		else
+		{
+			//plays animation of coin dropping from killed enemy
+			this->deltaTime = this->dtClock.restart().asSeconds();
+			this->timeElapsed += this->deltaTime;
+
+			//calculate progress based on speed
+			float progress = (this->timeElapsed * this->coinAnimationSpeed) /
+				this->coinDistance;
+
+			
+
+
+			if (progress >= 1.f)
+			{
+				progress = 1.f;
+				this->coinAnimationEnded = true;
+				this->firstFrame = true;
+			}
+
+			//cubic bezier curvce interpolation
+			float u = 1.f - progress;
+			float uu = u * u;
+			float uuu = uu * u;
+			float tt = progress * progress;
+			float ttt = tt * progress;
+
+			sf::Vector2f position = uuu * this->coinStart +
+				3.f * uu * u *
+				this->coinControlPoint + 3.f * u * tt * this->coinEnd +
+				ttt * this->coinEnd;
+
+			this->coinSprite.setPosition(position);
+			//std::cout << "current pos: " << position.x << ", " << position.y << '\n';
 		}
 	}
 }
@@ -104,12 +163,21 @@ void Animator::renderEscapeAnimation(sf::RenderTarget& target, bool play_escape)
 	}
 }
 
-//constructor
-Animator::Animator()
+void Animator::renderCoinAnimation(sf::RenderTarget& target, bool play_coin)
 {
-	this->initFlags();
+	if (play_coin)
+	{
+		target.draw(this->coinSprite);
+	}
+}
+
+//constructor
+Animator::Animator(sf::Texture& coin_texture)
+{
+	this->initVariables();
 	this->initSmokeTexture();
 	this->initSmokeSprite();
+	this->initCoinAnimation(coin_texture);
 }
 
 //deconstructor
@@ -149,6 +217,24 @@ void Animator::setSprite(sf::Sprite* sprite)
 	this->deathSprite = sprite;
 }
 
+void Animator::startCoinAnimation(sf::Vector2f coin_start, sf::Vector2f coin_end)
+{
+	//resets the clock since its been running a while
+	this->deltaTime = this->dtClock.restart().asSeconds();
+
+	this->coinStart = coin_start;
+	this->coinEnd = coin_end;
+
+	//calculate distance
+	this->coinDistance = std::sqrt((this->coinEnd.x - this->coinStart.x) *
+		(this->coinEnd.x - this->coinStart.x) +
+		(this->coinEnd.y - this->coinStart.y) *
+		(this->coinEnd.y - this->coinStart.y));
+
+	this->coinAnimationEnded = false;
+	this->timeElapsed = 0.f;
+}
+
 //public functions
 void Animator::resetAnimator()
 {
@@ -167,10 +253,17 @@ void Animator::update(std::string update_this)
 	{
 		this->updateEscapeAnimation();
 	}
+
+	if (update_this == "coin")
+	{
+		this->updateCoinAnimation();
+	}
 }
 
-void Animator::render(sf::RenderTarget& target, bool play_death, bool play_escape)
+void Animator::render(sf::RenderTarget& target, bool play_death, bool play_escape,
+	bool play_coin)
 {
 	this->renderDeathAnimation(target, play_death);
 	this->renderEscapeAnimation(target, play_escape);
+	this->renderCoinAnimation(target, play_coin);
 }

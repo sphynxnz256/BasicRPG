@@ -10,6 +10,7 @@
 #include <iomanip>
 #include <vector>
 #include <cassert>
+#include <cmath>
 
 //sfml
 #include <SFML/Graphics.hpp>

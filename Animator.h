@@ -16,30 +16,40 @@ private:
 
 	bool firstFrame;
 	bool animationEnd;
-	float deathAnimationSpeed;
-		
+
+	float deathAnimationSpeed;		
 
 	sf::Texture smokeTextureSheet;
 	sf::Sprite smokeSprite;
 	sf::IntRect currentFrame;
 
+	sf::Sprite coinSprite;
+	sf::Vector2f coinStart;
+	sf::Vector2f coinEnd;
+	sf::Vector2f coinControlPoint;
+	float coinAnimationSpeed;
+	float coinDistance;
+	bool coinAnimationEnded;
+
 	//private initation functions
-	void initFlags();
+	void initVariables();
 	void initSmokeTexture();
 	void initSmokeSprite();
-
+	void initCoinAnimation(sf::Texture& coin_texture); 
 
 	//private update functions
 	void updateDeathAnimation();
 	void updateEscapeAnimation();
+	void updateCoinAnimation();
 
 	//private render functions
 	void renderDeathAnimation(sf::RenderTarget& target, bool play_death);
 	void renderEscapeAnimation(sf::RenderTarget& target, bool play_escape);
+	void renderCoinAnimation(sf::RenderTarget& target, bool play_coin);
 
 public:
 	//constructor
-	Animator();
+	Animator(sf::Texture& coin_texture);
 	//deconstructor
 	~Animator();
 
@@ -54,9 +64,13 @@ public:
 	void setSprite(sf::Sprite* sprite);
 
 	//public functions
+	//void startDeathAnimation();
+	//void startEscapeAnimation();
+	void startCoinAnimation(sf::Vector2f coin_start, sf::Vector2f coin_end);
 	void resetAnimator();
 
 	void update(std::string update_this); 
-	void render(sf::RenderTarget& target, bool play_death, bool play_escape);
+	void render(sf::RenderTarget& target, bool play_death, bool play_escape,
+		bool play_coin);
 };
 

@@ -23,10 +23,13 @@ int main()
 	-drop animation
 	-pick up coins?
 
+-hovering tool tips?
+
 -levels
-	-everything has more hp
-	-new enemies
-	-more loots
+	-map for level backgrounds
+	-vector of file names of textures for enemes and boss for each level
+	-multipliers for boss/enemy max hp
+	-multiplier for coin drops
 
 -menu screen
 	-load game
