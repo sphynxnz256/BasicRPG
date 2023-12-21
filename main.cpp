@@ -19,9 +19,11 @@ int main()
 }
 
 /*to do
+-animator update
+	-split animator into controler and individual animation objects
+
 -coins
 	-drop animation
-	-pick up coins?
 
 -hovering tool tips?
 

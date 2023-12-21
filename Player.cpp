@@ -6,7 +6,7 @@
 //private functions
 void Player::initVariables()
 {
-	this->damage = 10.f;
+	this->damage = 1.f;
 	this->attackCDMax = 10.f;
 	this->attackCD = attackCDMax;
 	this->coins = 0;

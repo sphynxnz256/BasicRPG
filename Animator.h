@@ -30,6 +30,7 @@ private:
 	float coinAnimationSpeed;
 	float coinDistance;
 	bool coinAnimationEnded;
+	bool coinFirstFrame;
 
 	//private initation functions
 	void initVariables();

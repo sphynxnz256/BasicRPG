@@ -8,6 +8,7 @@
 void Animator::initVariables()
 {
 	this->firstFrame = true;
+	this->coinFirstFrame = true;
 	this->animationEnd = false;
 	this->coinAnimationEnded = true;
 	this->timeElapsed = 0.f;
@@ -37,8 +38,8 @@ void Animator::initCoinAnimation(sf::Texture& coin_texture)
 	this->coinSprite.setScale(0.1f, 0.1f);
 	this->coinStart = sf::Vector2f(0.f, 0.f);
 	this->coinEnd = sf::Vector2f(0.f, 0.f);
-	this->coinControlPoint = sf::Vector2f(300.f, 50.f);
-	this->coinAnimationSpeed = 400.f;
+	this->coinControlPoint = sf::Vector2f(300.f, 100.f);
+	this->coinAnimationSpeed = 500.f;
 	this->coinDistance = 0.f;
 }
 
@@ -104,10 +105,11 @@ void Animator::updateCoinAnimation()
 {
 	if (!this->coinAnimationEnded)
 	{
-		if (this->firstFrame)
+		if (this->coinFirstFrame)
 		{
+			//reset delta time
 			this->deltaTime = this->dtClock.restart().asSeconds();
-			this->firstFrame = false;
+			this->coinFirstFrame = false;
 		}
 		else
 		{
@@ -119,30 +121,25 @@ void Animator::updateCoinAnimation()
 			float progress = (this->timeElapsed * this->coinAnimationSpeed) /
 				this->coinDistance;
 
-			
-
-
+			//check if animation is finished
 			if (progress >= 1.f)
 			{
 				progress = 1.f;
 				this->coinAnimationEnded = true;
-				this->firstFrame = true;
+				this->coinFirstFrame = true;
 			}
 
-			//cubic bezier curvce interpolation
-			float u = 1.f - progress;
-			float uu = u * u;
-			float uuu = uu * u;
-			float tt = progress * progress;
-			float ttt = tt * progress;
+			//calc bezier interpilation
+			sf::Vector2f position = sf::Vector2f(0.f, 0.f);
+			position.x = pow(1 - progress, 2) * this->coinStart.x +
+				(1 - progress) * 2 * progress * this->coinControlPoint.x +
+				progress * progress * this->coinEnd.x;	
 
-			sf::Vector2f position = uuu * this->coinStart +
-				3.f * uu * u *
-				this->coinControlPoint + 3.f * u * tt * this->coinEnd +
-				ttt * this->coinEnd;
+			position.y = pow(1 - progress, 2) * this->coinStart.y +
+				(1 - progress) * 2 * progress * this->coinControlPoint.y +
+				progress * progress * this->coinEnd.y;
 
 			this->coinSprite.setPosition(position);
-			//std::cout << "current pos: " << position.x << ", " << position.y << '\n';
 		}
 	}
 }
@@ -165,7 +162,7 @@ void Animator::renderEscapeAnimation(sf::RenderTarget& target, bool play_escape)
 
 void Animator::renderCoinAnimation(sf::RenderTarget& target, bool play_coin)
 {
-	if (play_coin)
+	if (play_coin && !this->coinAnimationEnded)
 	{
 		target.draw(this->coinSprite);
 	}
@@ -225,6 +222,34 @@ void Animator::startCoinAnimation(sf::Vector2f coin_start, sf::Vector2f coin_end
 	this->coinStart = coin_start;
 	this->coinEnd = coin_end;
 
+	//set the control point so its on the same side as the coin ends up on
+	if (this->coinEnd.x > 400.f)
+	{
+		this->coinControlPoint.x = 600.f;
+	}
+	else
+	{
+		this->coinControlPoint.x = 200.f;
+	}
+
+	//smooth the speed out relative to the center
+	if (this->coinEnd.x < 100.f || this->coinEnd.x > 700.f)
+	{
+		this->coinAnimationSpeed = 600.f;
+	}
+	else if (this->coinEnd.x < 200.f || this->coinEnd.x > 600.f)
+	{
+		this->coinAnimationSpeed = 500.f;
+	}
+	else if (this->coinEnd.x < 300.f || this->coinEnd.x > 500.f)
+	{
+		this->coinAnimationSpeed = 400.f;
+	}
+	else
+	{
+		this->coinAnimationSpeed = 300.f;
+	}
+
 	//calculate distance
 	this->coinDistance = std::sqrt((this->coinEnd.x - this->coinStart.x) *
 		(this->coinEnd.x - this->coinStart.x) +
@@ -254,7 +279,7 @@ void Animator::update(std::string update_this)
 		this->updateEscapeAnimation();
 	}
 
-	if (update_this == "coin")
+	if (!this->coinAnimationEnded)
 	{
 		this->updateCoinAnimation();
 	}
