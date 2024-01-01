@@ -238,7 +238,7 @@ void Game::dropCoins(std::pair<int, int> coins_to_drop, sf::Vector2f coin_start)
 	for (size_t i = 0; i < this->coinsToDrop; i++)
 	{
 		Coin temp_coin(this->rng, this->window.getSize(), this->sharedCoinTexture);
-		//this->animator->startCoinAnimation(coin_start, temp_coin.getPosition());
+		this->animator->startCoinAnimation(coin_start, temp_coin.getPosition());
 		this->coinsVector.push_back(Coin(temp_coin));
 	}	
 }

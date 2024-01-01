@@ -130,14 +130,9 @@ void Animator::updateCoinAnimation()
 			}
 
 			//calc bezier interpilation
-			sf::Vector2f position = sf::Vector2f(0.f, 0.f);
-			position.x = pow(1 - progress, 2) * this->coinStart.x +
-				(1 - progress) * 2 * progress * this->coinControlPoint.x +
-				progress * progress * this->coinEnd.x;	
-
-			position.y = pow(1 - progress, 2) * this->coinStart.y +
-				(1 - progress) * 2 * progress * this->coinControlPoint.y +
-				progress * progress * this->coinEnd.y;
+			sf::Vector2f position = (1 - progress) * (1 - progress) * this->coinStart +
+				2 * (1 - progress) * progress * this->coinControlPoint +
+				progress * progress * this->coinEnd;
 
 			this->coinSprite.setPosition(position);
 		}
