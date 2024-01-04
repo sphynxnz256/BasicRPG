@@ -129,6 +129,12 @@ void Game::updateCombat()
 		{
 			this->animator->setSprite(this->boss->getSprite());
 			this->playDeathAnimation = true;
+
+			//coins drop
+			this->dropCoins(this->boss->getCoinsToDrop(), sf::Vector2f(
+				this->boss->getPosition().x + this->boss->getGlobalBounds().width / 2,
+				this->boss->getPosition().y + this->boss->getGlobalBounds().height / 2));
+
 			this->bossDeath();
 		}
 		//if fighting regular enemy and its dead, play death animation
@@ -136,6 +142,12 @@ void Game::updateCombat()
 		{
 			this->animator->setSprite(this->enemy->getSprite());
 			this->playDeathAnimation = true;
+
+			//coins drop
+			this->dropCoins(this->enemy->getCoinsToDrop(), sf::Vector2f(
+				this->enemy->getPosition().x + this->enemy->getGlobalBounds().width / 2,
+				this->enemy->getPosition().y + this->enemy->getGlobalBounds().height / 2));
+
 			this->enemyDeath();
 		}
 	}
@@ -144,6 +156,7 @@ void Game::updateCombat()
 		if(this->bossActive)
 		{
 			this->bossDeath();
+
 		}
 		else
 		{
@@ -217,11 +230,6 @@ void Game::enemyDeath()
 		this->ui->setHpBarLength(this->enemy->getHpCurrent(), this->enemy->getHpMax()); 
 		this->ui->setHpBarColor(this->enemy->getHpCurrent(), this->enemy->getHpMax());
 
-		//coins drop
-		this->dropCoins(this->enemy->getCoinsToDrop(), sf::Vector2f(
-			this->enemy->getPosition().x + this->enemy->getGlobalBounds().width / 2,
-			this->enemy->getPosition().y + this->enemy->getGlobalBounds().height / 2));
-
 		//check if enough enemies are killed for boss to spawn
 		if (this->killCounter >= 10)
 		{
@@ -237,8 +245,7 @@ void Game::dropCoins(std::pair<int, int> coins_to_drop, sf::Vector2f coin_start)
 	this->playCoinAnimation = true;
 	for (size_t i = 0; i < this->coinsToDrop; i++)
 	{
-		Coin temp_coin(this->rng, this->window.getSize(), this->sharedCoinTexture);
-		this->animator->startCoinAnimation(coin_start, temp_coin.getPosition());
+		Coin temp_coin(this->rng, this->window.getSize(), this->sharedCoinTexture, coin_start);
 		this->coinsVector.push_back(Coin(temp_coin));
 	}	
 }
@@ -278,11 +285,6 @@ void Game::bossDeath()
 		this->ui->setHpBarLength(this->boss->getHpCurrent(), this->boss->getHpMax());
 		this->ui->setHpBarColor(this->boss->getHpCurrent(), this->boss->getHpMax());
 		this->ui->setHpBarPosition(static_cast<float>(this->window.getSize().x), this->enemy->getGlobalBounds().top);
-
-		//coins drop
-		this->dropCoins(this->boss->getCoinsToDrop(), sf::Vector2f(
-			this->boss->getPosition().x + this->boss->getGlobalBounds().width / 2,
-			this->boss->getPosition().y + this->boss->getGlobalBounds().height / 2));
 	}
 }
 
@@ -352,15 +354,14 @@ void Game::updateAnimator()
 	{
 		this->animator->update("escape");
 	}
-
-	if (!this->playDeathAnimation && this->playCoinAnimation)
-	{
-		this->animator->update("coin");
-	}
 }
 
 void Game::updateCoins()
 {
+	for (Coin& coin : coinsVector)
+	{
+		coin.update();
+	}
 
 	static bool click_processed = false;
 	if(sf::Mouse::isButtonPressed(sf::Mouse::Left)) 
@@ -372,7 +373,7 @@ void Game::updateCoins()
 				std::vector<Coin> coinsToKeep;
 			for (auto& coin : this->coinsVector)
 			{	
-				if (coin.isMouseOver(this->mousePosition))
+				if (coin.isMouseOver(this->mousePosition) && coin.checkPosition())
 				{	
 					this->player->addCoins(coin.getCoinValue());
 					this->ui->setCoinsText(this->player->getCoins());					
@@ -422,7 +423,7 @@ void Game::renderBackground()
 
 void Game::renderCoins()
 {
-	for (auto coin : this->coinsVector)
+	for (Coin& coin : this->coinsVector)
 	{
 		coin.render(this->window);
 	}

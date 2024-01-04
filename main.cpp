@@ -19,13 +19,6 @@ int main()
 }
 
 /*to do
--animator update
-	-split animator into controler and individual animation objects
-
--coins
-	-drop animation
-
--hovering tool tips?
 
 -levels
 	-map for level backgrounds

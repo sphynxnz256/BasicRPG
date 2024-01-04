@@ -23,30 +23,30 @@ private:
 	sf::Sprite smokeSprite;
 	sf::IntRect currentFrame;
 
-	sf::Sprite coinSprite;
-	sf::Vector2f coinStart;
-	sf::Vector2f coinEnd;
-	sf::Vector2f coinControlPoint;
-	float coinAnimationSpeed;
-	float coinDistance;
-	bool coinAnimationEnded;
-	bool coinFirstFrame;
+	//sf::Sprite coinSprite;
+	//sf::Vector2f coinStart;
+	//sf::Vector2f coinEnd;
+	//sf::Vector2f coinControlPoint;
+	//float coinAnimationSpeed;
+	//float coinDistance;
+	//bool coinAnimationEnded;
+	//bool coinFirstFrame;
 
 	//private initation functions
 	void initVariables();
 	void initSmokeTexture();
 	void initSmokeSprite();
-	void initCoinAnimation(sf::Texture& coin_texture); 
+	//void initCoinAnimation(sf::Texture& coin_texture); 
 
 	//private update functions
 	void updateDeathAnimation();
 	void updateEscapeAnimation();
-	void updateCoinAnimation();
+	//void updateCoinAnimation();
 
 	//private render functions
 	void renderDeathAnimation(sf::RenderTarget& target, bool play_death);
 	void renderEscapeAnimation(sf::RenderTarget& target, bool play_escape);
-	void renderCoinAnimation(sf::RenderTarget& target, bool play_coin);
+	//void renderCoinAnimation(sf::RenderTarget& target, bool play_coin);
 
 public:
 	//constructor
@@ -67,7 +67,7 @@ public:
 	//public functions
 	//void startDeathAnimation();
 	//void startEscapeAnimation();
-	void startCoinAnimation(sf::Vector2f coin_start, sf::Vector2f coin_end);
+	//void startCoinAnimation(sf::Vector2f coin_start, sf::Vector2f coin_end);
 	void resetAnimator();
 
 	void update(std::string update_this); 
