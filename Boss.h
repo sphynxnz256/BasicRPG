@@ -1,17 +1,11 @@
 #pragma once
 
-#include "RNG.h"
-
-class Enemy
+class Boss
 {
 private:
 	//private variables
 	sf::Sprite sprite;
 	sf::Texture texture;
-	RNG& rng;
-	std::unordered_map<int, std::string> textureAddressMap;
-	std::unordered_map<int, std::shared_ptr<sf::Texture>> textureMap;
-	int textureNumber;
 
 	float hpMax;
 	float hpCurrent;
@@ -26,9 +20,9 @@ private:
 
 public:
 	//constructor
-	Enemy(RNG& rng);
+	Boss();
 	//deconstructor
-	~Enemy();
+	~Boss();
 
 	//getters
 	const sf::Vector2f getPosition() const;
@@ -41,10 +35,17 @@ public:
 	//setters
 	void setPosition(const float x, const float y);
 	void takeDamage(const float damage_taken);
-	
+
 	//public functions
-	void resetEnemy();
-	bool isDead();
+	void resetBoss();
+	bool isDead()
+	{
+		if (this->hpCurrent <= 0.f)
+		{
+			return true;
+		}
+		return false;
+	}
 
 	void render(sf::RenderTarget& target);
 };

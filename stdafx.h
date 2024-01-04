@@ -7,6 +7,11 @@
 #include <memory>
 #include <utility>
 #include <sstream>
+#include <iomanip>
+#include <vector>
+#include <cassert>
+#include <cmath>
+
 
 //sfml
 #include <SFML/Graphics.hpp>

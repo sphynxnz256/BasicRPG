@@ -19,20 +19,20 @@ int main()
 }
 
 /*to do
--bosses
-	-timer
-	-more hp
-	-more loots
 
 -levels
-	-everything has more hp
-	-new enemies
-	-more loots
-
--saving games
+	-map for level backgrounds
+	-vector of file names of textures for enemes and boss for each level
+	-multipliers for boss/enemy max hp
+	-multiplier for coin drops
 
 -menu screen
 	-load game
 	-new game
+	-options
 	-exit etc
+
+-saving games
+
+
 */

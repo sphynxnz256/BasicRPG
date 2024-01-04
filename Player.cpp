@@ -40,6 +40,7 @@ const int Player::getUpgradeCost() const
 	return this->upgradeCost;
 }
 
+//public functions
 void Player::upgradeDamage()
 {
 	this->damage *= 2.f;
@@ -52,7 +53,6 @@ void Player::addCoins(int coins_to_add)
 	this->coins += coins_to_add;
 }
 
-//public functions
 bool Player::canUpgrade()
 {
 	if (this->coins >= this->upgradeCost)

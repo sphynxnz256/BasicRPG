@@ -24,6 +24,6 @@ public:
 	bool isMouseOver(const sf::Vector2f& mouse_pos);
 	bool isClicked(const sf::Vector2f& mouse_pos);
 
-	void draw(sf::RenderTarget& target, const sf::Vector2f& mouse_pos);
+	void render(sf::RenderTarget& target, const sf::Vector2f& mouse_pos);
 };
 

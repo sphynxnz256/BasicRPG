@@ -49,7 +49,7 @@ bool Button::isClicked(const sf::Vector2f& mouse_pos)
 	return isMouseOver(mouse_pos) && sf::Mouse::isButtonPressed(sf::Mouse::Left);
 }
 
-void Button::draw(sf::RenderTarget& target, const sf::Vector2f& mouse_pos)
+void Button::render(sf::RenderTarget& target, const sf::Vector2f& mouse_pos)
 {
 
 	if (isMouseOver(mouse_pos))
