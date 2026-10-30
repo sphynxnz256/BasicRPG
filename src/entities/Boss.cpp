@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "Boss.h"
+#include "entities/Boss.h"
 
 //private functions
 void Boss::initVariables()

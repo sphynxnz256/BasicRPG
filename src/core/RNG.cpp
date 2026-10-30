@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "RNG.h"
+#include "core/RNG.h"
 
 //constructor
 RNG::RNG() : generator(std::random_device()()) {}

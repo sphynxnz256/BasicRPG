@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "Player.h"
+#include "entities/Player.h"
 
 /*the player class holds the players state*/
 
