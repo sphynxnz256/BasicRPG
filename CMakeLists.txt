@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.20)
-project(BasicRPG LANGUAGES CXX)
+project(ClickerGame LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -17,7 +17,7 @@ FetchContent_Declare(SFML
 set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(SFML)
 
-add_executable(BasicRPG
+add_executable(ClickerGame
     src/main.cpp
     src/core/Game.cpp
     src/core/Level.cpp
@@ -31,12 +31,12 @@ add_executable(BasicRPG
     src/ui/UI.cpp
 )
 
-target_precompile_headers(BasicRPG PRIVATE src/stdafx.h)
+target_precompile_headers(ClickerGame PRIVATE src/stdafx.h)
 if(MSVC)
-    target_compile_options(BasicRPG PRIVATE /W3 /sdl)
+    target_compile_options(ClickerGame PRIVATE /W3 /sdl)
 endif()
-target_include_directories(BasicRPG PRIVATE ${CMAKE_SOURCE_DIR}/src)
-target_link_libraries(BasicRPG PRIVATE
+target_include_directories(ClickerGame PRIVATE ${CMAKE_SOURCE_DIR}/src)
+target_link_libraries(ClickerGame PRIVATE
     sfml-graphics
     sfml-window
     sfml-system
@@ -45,15 +45,15 @@ target_link_libraries(BasicRPG PRIVATE
 )
 
 # Copy the game assets next to the executable so it runs on its own.
-add_custom_command(TARGET BasicRPG POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/assets $<TARGET_FILE_DIR:BasicRPG>
+add_custom_command(TARGET ClickerGame POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/assets $<TARGET_FILE_DIR:ClickerGame>
 )
 
 # SFML 2's audio module loads OpenAL from a DLL at runtime, even in a static build.
 if(WIN32)
-    add_custom_command(TARGET BasicRPG POST_BUILD
+    add_custom_command(TARGET ClickerGame POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_if_different
             ${sfml_SOURCE_DIR}/extlibs/bin/$<IF:$<EQUAL:${CMAKE_SIZEOF_VOID_P},8>,x64,x86>/openal32.dll
-            $<TARGET_FILE_DIR:BasicRPG>
+            $<TARGET_FILE_DIR:ClickerGame>
     )
 endif()

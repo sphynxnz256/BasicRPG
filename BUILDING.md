@@ -1,4 +1,4 @@
-# Building BasicRPG
+# Building ClickerGame
 
 The game uses SFML 2.6.2. CMake downloads and builds it automatically the first time you configure the project (this needs an internet connection and takes a few minutes). After that it's cached in the `build/` folder.
 
@@ -20,7 +20,7 @@ The game uses SFML 2.6.2. CMake downloads and builds it automatically the first 
 ```
 cmake -S . -B build
 cmake --build build --config Debug
-build\Debug\BasicRPG.exe
+build\Debug\ClickerGame.exe
 ```
 
 SFML is linked statically, so there are no SFML DLLs. The build copies the contents of `assets/` and `openal32.dll` (used by SFML's audio) next to the executable, so it can be run directly.
