@@ -4,13 +4,18 @@ project(BasicRPG LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# The bundled SFML 2.6.0 binaries in external/SFML were built with MSVC (x64),
-# so this project must be built with the MSVC compiler.
-if(NOT MSVC)
-    message(FATAL_ERROR "The bundled SFML libraries require the MSVC compiler.")
-endif()
-
-set(SFML_ROOT ${CMAKE_SOURCE_DIR}/external/SFML)
+# Download and build SFML from source on the first configure.
+# It's built as static libraries so the game doesn't need the SFML DLLs.
+include(FetchContent)
+FetchContent_Declare(SFML
+    GIT_REPOSITORY https://github.com/SFML/SFML.git
+    GIT_TAG 2.6.2
+    GIT_SHALLOW ON
+    EXCLUDE_FROM_ALL
+    SYSTEM
+)
+set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(SFML)
 
 add_executable(BasicRPG
     src/main.cpp
@@ -27,24 +32,28 @@ add_executable(BasicRPG
 )
 
 target_precompile_headers(BasicRPG PRIVATE src/stdafx.h)
-target_compile_options(BasicRPG PRIVATE /W3 /sdl)
-target_include_directories(BasicRPG PRIVATE
-    ${CMAKE_SOURCE_DIR}/src
-    ${SFML_ROOT}/include
+if(MSVC)
+    target_compile_options(BasicRPG PRIVATE /W3 /sdl)
+endif()
+target_include_directories(BasicRPG PRIVATE ${CMAKE_SOURCE_DIR}/src)
+target_link_libraries(BasicRPG PRIVATE
+    sfml-graphics
+    sfml-window
+    sfml-system
+    sfml-network
+    sfml-audio
 )
-target_link_directories(BasicRPG PRIVATE ${SFML_ROOT}/lib)
 
-# Link the debug (-d) SFML libraries in Debug builds and the regular ones otherwise.
-foreach(module graphics window system network audio)
-    target_link_libraries(BasicRPG PRIVATE
-        debug sfml-${module}-d
-        optimized sfml-${module}
-    )
-endforeach()
-
-# Copy the SFML DLLs and game assets next to the executable so it runs on its own.
-file(GLOB SFML_DLLS ${SFML_ROOT}/bin/*.dll)
+# Copy the game assets next to the executable so it runs on its own.
 add_custom_command(TARGET BasicRPG POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different ${SFML_DLLS} $<TARGET_FILE_DIR:BasicRPG>
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/assets $<TARGET_FILE_DIR:BasicRPG>
 )
+
+# SFML 2's audio module loads OpenAL from a DLL at runtime, even in a static build.
+if(WIN32)
+    add_custom_command(TARGET BasicRPG POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            ${sfml_SOURCE_DIR}/extlibs/bin/$<IF:$<EQUAL:${CMAKE_SIZEOF_VOID_P},8>,x64,x86>/openal32.dll
+            $<TARGET_FILE_DIR:BasicRPG>
+    )
+endif()
