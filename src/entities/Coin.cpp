@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "Coin.h"
+#include "entities/Coin.h"
 
 //private functions
 void Coin::initVariables(const sf::Vector2u& target_size)

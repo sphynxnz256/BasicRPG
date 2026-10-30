@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "UI.h"
+#include "ui/UI.h"
 
 /*the ui class displays info useful to the user*/
 

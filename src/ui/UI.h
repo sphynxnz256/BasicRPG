@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Enemy.h"
-#include "Button.h"
+#include "entities/Enemy.h"
+#include "ui/Button.h"
 
 class UI
 {

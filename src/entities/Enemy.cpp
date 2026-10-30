@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "Enemy.h"
+#include "entities/Enemy.h"
 
 /*the enemy holds the enemies state*/
 

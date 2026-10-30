@@ -1,6 +1,6 @@
 #pragma once
 
-#include "RNG.h"
+#include "core/RNG.h"
 
 class Enemy
 {

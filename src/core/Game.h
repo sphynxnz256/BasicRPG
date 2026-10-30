@@ -1,12 +1,12 @@
 #pragma once
 
-#include "Enemy.h"
-#include "Player.h"
-#include "Boss.h"
-#include "UI.h"
-#include "Animator.h"
-#include "RNG.h"
-#include "Coin.h"
+#include "entities/Enemy.h"
+#include "entities/Player.h"
+#include "entities/Boss.h"
+#include "ui/UI.h"
+#include "graphics/Animator.h"
+#include "core/RNG.h"
+#include "entities/Coin.h"
 
 class Game
 {

@@ -1,6 +1,6 @@
 #include "stdafx.h"
-#include "Animator.h"
-#include "Enemy.h"
+#include "graphics/Animator.h"
+#include "entities/Enemy.h"
 
 /*the animator class plays animations*/
 
