@@ -7,7 +7,7 @@
 void Game::initWindow()
 {
 	//creates the game window
-	this->window.create(sf::VideoMode(800, 600), "Basic RPG", sf::Style::Close | sf::Style::Titlebar);
+	this->window.create(sf::VideoMode(800, 600), "Clicker Game", sf::Style::Close | sf::Style::Titlebar);
 }
 
 void Game::initPlayer()
